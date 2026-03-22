@@ -1,0 +1,32 @@
+# Python
+__pycache__/
+*.py[cod]
+*.pyo
+*.pyd
+.Python
+*.egg
+*.egg-info/
+dist/
+build/
+.eggs/
+
+# Model ağırlıkları (çok büyük - GitHub'a yükleme)
+results/models/*.pth
+
+# Veri klasörü (büyük veri seti - isteğe bağlı)
+# Eğer veri setini de yüklemek istiyorsanız bu satırı silin:
+data/
+
+# Virtual environment
+venv/
+.env/
+env/
+
+# IDE
+.vscode/
+.idea/
+*.code-workspace
+
+# OS
+.DS_Store
+Thumbs.db

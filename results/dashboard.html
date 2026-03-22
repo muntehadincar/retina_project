@@ -1,0 +1,803 @@
+<!DOCTYPE html>
+<html lang="tr">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Retina Segmentation Dashboard</title>
+  <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.0/dist/chart.umd.min.js"></script>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+  <style>
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+    :root {
+      --bg: #0d1117;
+      --surface: #161b22;
+      --surface2: #21262d;
+      --border: #30363d;
+      --unet: #58a6ff;
+      --att: #f78166;
+      --accent: #3fb950;
+      --text: #e6edf3;
+      --muted: #8b949e;
+      --card-radius: 14px;
+    }
+
+    body {
+      background: var(--bg);
+      color: var(--text);
+      font-family: 'Inter', sans-serif;
+      min-height: 100vh;
+      padding: 24px;
+    }
+
+    /* ── Header ── */
+    header {
+      display: flex;
+      align-items: center;
+      gap: 16px;
+      margin-bottom: 32px;
+    }
+    .logo {
+      width: 48px; height: 48px;
+      background: linear-gradient(135deg, var(--unet), var(--att));
+      border-radius: 12px;
+      display: flex; align-items: center; justify-content: center;
+      font-size: 24px;
+    }
+    header h1 { font-size: 1.6rem; font-weight: 700; }
+    header p  { font-size: 0.85rem; color: var(--muted); margin-top: 2px; }
+
+    /* ── Summary Cards ── */
+    .cards {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
+      gap: 16px;
+      margin-bottom: 32px;
+    }
+    .card {
+      background: var(--surface);
+      border: 1px solid var(--border);
+      border-radius: var(--card-radius);
+      padding: 20px;
+      transition: transform .2s, box-shadow .2s;
+    }
+    .card:hover { transform: translateY(-2px); box-shadow: 0 8px 24px rgba(0,0,0,.4); }
+    .card-label { font-size: .75rem; color: var(--muted); text-transform: uppercase; letter-spacing: .06em; margin-bottom: 8px; }
+    .card-value { font-size: 1.9rem; font-weight: 700; line-height: 1; }
+    .card-sub   { font-size: .75rem; color: var(--muted); margin-top: 6px; }
+    .blue  { color: var(--unet); }
+    .red   { color: var(--att);  }
+    .green { color: var(--accent); }
+
+    /* ── Tabs ── */
+    .tabs { display: flex; gap: 8px; margin-bottom: 20px; flex-wrap: wrap; }
+    .tab {
+      padding: 8px 18px;
+      border-radius: 8px;
+      border: 1px solid var(--border);
+      background: var(--surface);
+      color: var(--muted);
+      cursor: pointer;
+      font-size: .85rem;
+      font-weight: 500;
+      transition: all .2s;
+    }
+    .tab:hover { border-color: var(--unet); color: var(--text); }
+    .tab.active { background: var(--unet); border-color: var(--unet); color: #0d1117; font-weight: 600; }
+
+    /* ── Panels ── */
+    .panel { display: none; }
+    .panel.active { display: block; }
+
+    /* ── Chart grid ── */
+    .chart-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(420px, 1fr));
+      gap: 20px;
+      margin-bottom: 24px;
+    }
+    .chart-card {
+      background: var(--surface);
+      border: 1px solid var(--border);
+      border-radius: var(--card-radius);
+      padding: 20px;
+    }
+    .chart-card h3 { font-size: .9rem; color: var(--muted); margin-bottom: 16px; font-weight: 500; }
+    canvas { width: 100% !important; }
+
+    /* ── Full-width chart ── */
+    .chart-full {
+      background: var(--surface);
+      border: 1px solid var(--border);
+      border-radius: var(--card-radius);
+      padding: 20px;
+      margin-bottom: 24px;
+    }
+    .chart-full h3 { font-size: .9rem; color: var(--muted); margin-bottom: 16px; font-weight: 500; }
+
+    /* ── Legend ── */
+    .legend { display: flex; gap: 24px; margin-bottom: 20px; }
+    .legend-item { display: flex; align-items: center; gap: 8px; font-size: .85rem; }
+    .dot { width: 12px; height: 12px; border-radius: 50%; }
+
+    /* ── Table ── */
+    .table-wrap { overflow-x: auto; border-radius: var(--card-radius); border: 1px solid var(--border); }
+    table { width: 100%; border-collapse: collapse; font-size: .82rem; }
+    thead th {
+      background: var(--surface2);
+      padding: 12px 14px;
+      text-align: left;
+      font-weight: 600;
+      color: var(--muted);
+      white-space: nowrap;
+      border-bottom: 1px solid var(--border);
+    }
+    tbody tr:nth-child(even) { background: rgba(255,255,255,.02); }
+    tbody tr:hover { background: rgba(88,166,255,.07); }
+    tbody td { padding: 10px 14px; border-bottom: 1px solid rgba(48,54,61,.5); }
+    .badge {
+      display: inline-block;
+      padding: 2px 8px;
+      border-radius: 6px;
+      font-size: .75rem;
+      font-weight: 600;
+    }
+    .badge-blue { background: rgba(88,166,255,.15); color: var(--unet); }
+    .badge-red  { background: rgba(247,129,102,.15); color: var(--att); }
+
+    .metric-bar-wrap { display: flex; align-items: center; gap: 8px; }
+    .metric-bar {
+      height: 6px; border-radius: 3px;
+      background: linear-gradient(90deg, var(--unet), #79c0ff);
+    }
+    .metric-bar-red {
+      background: linear-gradient(90deg, var(--att), #ffa198);
+    }
+
+    footer { text-align: center; color: var(--muted); font-size: .75rem; margin-top: 32px; }
+  </style>
+</head>
+<body>
+
+<header>
+  <div class="logo">👁️</div>
+  <div>
+    <h1>Retina Segmentation Dashboard</h1>
+    <p>UNet vs AttentionUNet · 119 test görüntüsü</p>
+  </div>
+</header>
+
+<!-- Summary Cards -->
+<div class="cards" id="summary-cards"></div>
+
+<!-- Tabs -->
+<div class="tabs">
+  <button class="tab active" onclick="switchTab('metrics')">📊 Değerlendirme Metrikleri</button>
+  <button class="tab" onclick="switchTab('clinical')">🩺 Klinik Özellikler</button>
+  <button class="tab" onclick="switchTab('table')">📋 Tablo Görünümü</button>
+</div>
+
+<!-- PANEL: Metrics -->
+<div class="panel active" id="panel-metrics">
+  <div class="legend">
+    <div class="legend-item"><div class="dot" style="background:var(--unet)"></div> UNet</div>
+    <div class="legend-item"><div class="dot" style="background:var(--att)"></div> AttentionUNet</div>
+  </div>
+  <div class="chart-grid">
+    <div class="chart-card"><h3>🎯 Ortalama Metrik Karşılaştırması (Radar)</h3><canvas id="radarChart" height="280"></canvas></div>
+    <div class="chart-card"><h3>📦 Dice Skoru Dağılımı (Box-benzeri)</h3><canvas id="boxChart" height="280"></canvas></div>
+    <div class="chart-card"><h3>📈 Dice Skoru – Tüm Örnekler</h3><canvas id="diceLineChart" height="280"></canvas></div>
+    <div class="chart-card"><h3>📈 IoU Skoru – Tüm Örnekler</h3><canvas id="iouLineChart" height="280"></canvas></div>
+    <div class="chart-card"><h3>✅ Sensitivity Karşılaştırması</h3><canvas id="sensChart" height="280"></canvas></div>
+    <div class="chart-card"><h3>🎯 Precision Karşılaştırması</h3><canvas id="precChart" height="280"></canvas></div>
+  </div>
+</div>
+
+<!-- PANEL: Clinical -->
+<div class="panel" id="panel-clinical">
+  <div class="legend">
+    <div class="legend-item"><div class="dot" style="background:var(--unet)"></div> UNet</div>
+    <div class="legend-item"><div class="dot" style="background:var(--att)"></div> AttentionUNet</div>
+  </div>
+  <div class="chart-full">
+    <h3>🩸 Damar Piksel Sayısı – Tüm Görüntüler (Çubuk)</h3>
+    <canvas id="clinBarChart" height="120"></canvas>
+  </div>
+  <div class="chart-grid">
+    <div class="chart-card"><h3>📊 Damar Alan Oranı Dağılımı</h3><canvas id="clinHistChart" height="280"></canvas></div>
+    <div class="chart-card"><h3>🔵 UNet vs AttentionUNet Piksel Scatter</h3><canvas id="scatterChart" height="280"></canvas></div>
+  </div>
+</div>
+
+<!-- PANEL: Table -->
+<div class="panel" id="panel-table">
+  <div class="table-wrap">
+    <table>
+      <thead>
+        <tr>
+          <th>Örnek</th>
+          <th>Model</th>
+          <th>Dice ↑</th>
+          <th>IoU ↑</th>
+          <th>Accuracy ↑</th>
+          <th>Sensitivity ↑</th>
+          <th>Specificity ↑</th>
+          <th>Precision ↑</th>
+        </tr>
+      </thead>
+      <tbody id="tableBody"></tbody>
+    </table>
+  </div>
+</div>
+
+<footer>Retina Projesi · 2026 · UNet &amp; AttentionUNet</footer>
+
+<script>
+/* ══════════════════════════════════════════
+   RAW DATA – embedded from CSV files
+══════════════════════════════════════════ */
+const unetRaw = [
+[1,0.531721,0.362139,0.897171,0.783535,0.906320,0.402398],
+[2,0.541274,0.371059,0.883408,0.645938,0.911710,0.465799],
+[3,0.482474,0.317935,0.894791,0.788712,0.901824,0.347535],
+[4,0.599866,0.428435,0.908600,0.760373,0.923278,0.495312],
+[5,0.460944,0.299498,0.897858,0.573432,0.924602,0.385351],
+[6,0.540996,0.370798,0.899460,0.782232,0.909067,0.413481],
+[7,0.480986,0.316643,0.888168,0.770068,0.896689,0.349707],
+[8,0.741361,0.589018,0.951920,0.823787,0.963616,0.673929],
+[9,0.737258,0.583855,0.943207,0.814157,0.957207,0.673633],
+[10,0.694093,0.531503,0.932831,0.804057,0.946313,0.610588],
+[11,0.687597,0.523922,0.941544,0.824726,0.951427,0.589568],
+[12,0.662919,0.495796,0.948761,0.843854,0.955422,0.545875],
+[13,0.713837,0.555013,0.945755,0.853677,0.953681,0.613363],
+[14,0.707014,0.546808,0.935883,0.804890,0.949812,0.630362],
+[15,0.616691,0.445808,0.914566,0.703420,0.937429,0.549000],
+[16,0.707723,0.547656,0.929321,0.846746,0.938604,0.607913],
+[17,0.727163,0.571293,0.944763,0.843799,0.954412,0.638856],
+[18,0.695404,0.533041,0.936600,0.837246,0.946001,0.594659],
+[19,0.693092,0.530329,0.930176,0.824346,0.941368,0.597894],
+[20,0.703000,0.542020,0.942291,0.904060,0.945416,0.575100],
+[21,0.657884,0.490184,0.949280,0.910282,0.951487,0.515068],
+[22,0.591012,0.419459,0.958755,0.821970,0.963901,0.461375],
+[23,0.788954,0.651465,0.959534,0.901929,0.964807,0.701132],
+[24,0.753171,0.604069,0.963776,0.779595,0.977829,0.728479],
+[25,0.739160,0.586244,0.947586,0.830263,0.959111,0.666074],
+[26,0.810430,0.681280,0.960175,0.944953,0.961682,0.709435],
+[27,0.738969,0.586004,0.960190,0.841230,0.968731,0.658876],
+[28,0.775133,0.632830,0.960648,0.875862,0.967764,0.695183],
+[29,0.772222,0.628959,0.962814,0.850875,0.971770,0.706879],
+[30,0.753651,0.604687,0.952896,0.898402,0.957648,0.649072],
+[31,0.729864,0.574634,0.961823,0.767310,0.975839,0.695903],
+[32,0.743614,0.591867,0.962173,0.846679,0.970175,0.662917],
+[33,0.684787,0.520666,0.974518,0.919878,0.976213,0.545400],
+[34,0.790030,0.652934,0.962723,0.885379,0.969376,0.713222],
+[35,1.000000,1.000000,1.000000,1.000000,1.000000,1.000000],
+[36,1.000000,1.000000,1.000000,1.000000,1.000000,1.000000],
+[37,0.784725,0.645718,0.965851,0.916629,0.969437,0.686007],
+[38,0.743903,0.592234,0.949203,0.864010,0.957157,0.653114],
+[39,0.799782,0.666363,0.960831,0.881382,0.968569,0.732010],
+[40,0.746638,0.595708,0.942795,0.868008,0.950838,0.655046],
+[41,0.785155,0.646301,0.964401,0.839008,0.974940,0.737799],
+[42,0.787295,0.649206,0.959534,0.889453,0.965977,0.706187],
+[43,0.776281,0.634362,0.958435,0.853223,0.968148,0.712069],
+[44,0.794218,0.658674,0.962204,0.899849,0.967704,0.710781],
+[45,0.791742,0.655275,0.955826,0.918391,0.959593,0.695790],
+[46,0.800193,0.666934,0.955719,0.931549,0.958262,0.701303],
+[47,0.747529,0.596844,0.951660,0.826286,0.963548,0.682480],
+[48,0.775143,0.632844,0.948486,0.907942,0.952881,0.676235],
+[49,0.804692,0.673209,0.957062,0.932143,0.959674,0.707901],
+[50,0.773150,0.630191,0.948639,0.884639,0.955666,0.686617],
+[51,0.805127,0.673818,0.962418,0.878301,0.970574,0.743208],
+[52,0.790712,0.653865,0.957092,0.897752,0.962982,0.706477],
+[53,0.785761,0.647122,0.959961,0.856533,0.969659,0.725792],
+[54,0.779397,0.638534,0.951248,0.917127,0.954784,0.677632],
+[55,0.705720,0.545261,0.967422,0.738391,0.980216,0.675818],
+[56,0.785075,0.646193,0.954910,0.869782,0.963813,0.715403],
+[57,0.791673,0.655181,0.955566,0.909883,0.960239,0.700646],
+[58,0.774954,0.632592,0.986893,0.769511,0.993461,0.780475],
+[59,0.774364,0.631806,0.951920,0.907519,0.956360,0.675284],
+[60,0.778738,0.637650,0.953506,0.865956,0.962642,0.707481],
+[61,0.786158,0.647661,0.951157,0.922691,0.954225,0.684823],
+[62,0.694252,0.531689,0.979141,0.709324,0.988461,0.679807],
+[63,0.797561,0.663286,0.962509,0.885960,0.969470,0.725202],
+[64,0.770126,0.626183,0.953598,0.874807,0.961281,0.687821],
+[65,0.768794,0.624423,0.950302,0.903253,0.955039,0.669179],
+[66,0.766284,0.621119,0.948425,0.905096,0.952890,0.664388],
+[67,0.793248,0.657342,0.960938,0.859167,0.970662,0.736724],
+[68,0.754313,0.605539,0.946106,0.892363,0.951598,0.653253],
+[69,0.791570,0.655040,0.957443,0.880905,0.965174,0.718686],
+[70,0.796938,0.662424,0.958313,0.903133,0.963809,0.713089],
+[71,0.790163,0.653115,0.953522,0.905145,0.958699,0.701100],
+[72,0.769269,0.625050,0.957199,0.862412,0.965748,0.694284],
+[73,0.751764,0.602261,0.948990,0.890413,0.954554,0.650475],
+[74,0.721430,0.564248,0.964813,0.739658,0.979593,0.704079],
+[75,0.735244,0.581333,0.961945,0.827281,0.971133,0.661635],
+[76,0.784589,0.645534,0.959732,0.894306,0.965576,0.698851],
+[77,0.776603,0.634792,0.950348,0.913732,0.954167,0.675263],
+[78,0.736602,0.583032,0.940155,0.880681,0.946399,0.633037],
+[79,0.678699,0.513659,0.976639,0.734666,0.985048,0.630655],
+[80,0.775718,0.633610,0.959579,0.856902,0.968699,0.708585],
+[81,0.739426,0.586578,0.940872,0.886202,0.946589,0.634360],
+[82,0.659183,0.491628,0.951355,0.773651,0.962860,0.574222],
+[83,0.695738,0.533434,0.938889,0.810729,0.950975,0.609315],
+[84,0.789203,0.651805,0.958649,0.908001,0.963369,0.697895],
+[85,0.765989,0.620731,0.956955,0.875925,0.964042,0.680572],
+[86,0.752127,0.602727,0.960434,0.799756,0.973473,0.709852],
+[87,0.771627,0.628171,0.947433,0.923077,0.950026,0.662870],
+[88,0.774465,0.631940,0.953369,0.888118,0.959834,0.686600],
+[89,0.780198,0.639610,0.956573,0.866381,0.965380,0.709609],
+[90,0.718419,0.560572,0.936737,0.883562,0.942082,0.605287],
+[91,0.707671,0.547593,0.948944,0.827206,0.958773,0.618321],
+[92,0.757857,0.610120,0.946625,0.875700,0.954103,0.667968],
+[93,0.378916,0.233743,0.974289,0.254581,0.997166,0.740634],
+[94,0.766614,0.621552,0.957504,0.851135,0.967006,0.697362],
+[95,0.790619,0.653738,0.956818,0.921207,0.960275,0.692457],
+[96,0.779598,0.638804,0.956879,0.908893,0.961274,0.682507],
+[97,0.792730,0.656630,0.967285,0.855414,0.976112,0.738606],
+[98,0.733493,0.579146,0.971115,0.747275,0.983691,0.720210],
+[99,0.705362,0.544833,0.965454,0.746145,0.978321,0.668806],
+[100,0.785669,0.646997,0.948334,0.945028,0.948702,0.672300],
+[101,0.787854,0.649966,0.968552,0.853099,0.977035,0.731880],
+[102,0.449250,0.289698,0.980957,0.315953,0.997716,0.777099],
+[103,0.759793,0.612634,0.969589,0.844587,0.977137,0.690471],
+[104,0.761241,0.614518,0.955597,0.870847,0.963095,0.676141],
+[105,0.439073,0.281290,0.982651,0.305213,0.998065,0.782074],
+[106,0.774961,0.632602,0.953262,0.898620,0.958637,0.681219],
+[107,0.679728,0.514839,0.958344,0.824417,0.965931,0.578244],
+[108,0.783570,0.644156,0.952805,0.914570,0.956744,0.685396],
+[109,0.759443,0.612179,0.972305,0.856502,0.978534,0.682143],
+[110,0.376018,0.231540,0.926315,0.784790,0.930436,0.247239],
+[111,0.444187,0.285501,0.904877,0.845840,0.907654,0.301173],
+[112,0.396578,0.247332,0.916046,0.866731,0.917667,0.257110],
+[113,0.483381,0.318723,0.925766,0.930879,0.925568,0.326449],
+[114,0.368620,0.225956,0.949036,0.758755,0.952841,0.243446],
+[115,0.695208,0.532811,0.931778,0.875665,0.937250,0.576419],
+[116,0.720831,0.563515,0.938919,0.804358,0.953545,0.653020],
+[117,0.736244,0.582583,0.951874,0.793725,0.966494,0.686525],
+[118,0.694094,0.531503,0.926819,0.765583,0.946431,0.634815],
+[119,0.667400,0.500826,0.935425,0.862482,0.941349,0.544289],
+];
+
+const attRaw = [
+[1,0.522153,0.353320,0.880524,0.876101,0.880880,0.371903],
+[2,0.582409,0.410844,0.882278,0.770884,0.895555,0.467989],
+[3,0.470681,0.307771,0.876724,0.881472,0.876409,0.321058],
+[4,0.607102,0.435856,0.899551,0.861304,0.903339,0.468756],
+[5,0.465208,0.303108,0.875809,0.709277,0.889537,0.346109],
+[6,0.539656,0.369540,0.890091,0.850524,0.893334,0.395207],
+[7,0.472677,0.309480,0.873077,0.845351,0.875078,0.328054],
+[8,0.736954,0.583473,0.946930,0.888727,0.952243,0.629457],
+[9,0.745441,0.594185,0.938660,0.917680,0.940936,0.627639],
+[10,0.707656,0.547576,0.931366,0.876509,0.937109,0.593351],
+[11,0.708515,0.548605,0.940979,0.919601,0.942788,0.576244],
+[12,0.681792,0.517212,0.948639,0.921544,0.950359,0.541035],
+[13,0.716256,0.557943,0.941620,0.929727,0.942644,0.582509],
+[14,0.715317,0.556805,0.932022,0.888554,0.936644,0.598610],
+[15,0.655616,0.487670,0.909332,0.883336,0.912147,0.521242],
+[16,0.723144,0.566348,0.928741,0.920882,0.929625,0.595315],
+[17,0.746818,0.595937,0.944763,0.933881,0.945803,0.622189],
+[18,0.692972,0.530189,0.929474,0.920741,0.930300,0.555544],
+[19,0.708290,0.548335,0.927780,0.916720,0.928950,0.577081],
+[20,0.704090,0.543317,0.938950,0.961422,0.937113,0.555426],
+[21,0.660596,0.493201,0.947678,0.950441,0.947521,0.506220],
+[22,0.618905,0.448126,0.961121,0.870791,0.964519,0.480046],
+[23,0.794291,0.658775,0.957336,0.982169,0.955063,0.666749],
+[24,0.765425,0.619991,0.960495,0.909169,0.964411,0.660929],
+[25,0.754594,0.605901,0.946198,0.924770,0.948302,0.637315],
+[26,0.807911,0.677727,0.957764,0.985942,0.954974,0.684340],
+[27,0.763911,0.618006,0.960831,0.946014,0.961894,0.640598],
+[28,0.796790,0.662220,0.961365,0.978128,0.959958,0.672173],
+[29,0.782994,0.643378,0.960434,0.963543,0.960185,0.659431],
+[30,0.784857,0.645897,0.957336,0.970320,0.956204,0.658915],
+[31,0.758669,0.611174,0.963150,0.861748,0.970457,0.677615],
+[32,0.757076,0.609108,0.959793,0.967028,0.959292,0.622027],
+[33,0.676743,0.511422,0.972260,0.965010,0.972484,0.521084],
+[34,0.788680,0.651092,0.958298,0.982470,0.956218,0.658745],
+[35,1.000000,1.000000,1.000000,1.000000,1.000000,1.000000],
+[36,1.000000,1.000000,1.000000,1.000000,1.000000,1.000000],
+[37,0.780978,0.640660,0.962753,0.977978,0.961644,0.650037],
+[38,0.768164,0.623593,0.951019,0.950322,0.951084,0.644606],
+[39,0.812370,0.684026,0.960098,0.973182,0.958824,0.697167],
+[40,0.759106,0.611741,0.940964,0.957888,0.939144,0.628648],
+[41,0.799835,0.666438,0.962982,0.953946,0.963742,0.688592],
+[42,0.792607,0.656461,0.957367,0.967561,0.956430,0.671235],
+[43,0.806389,0.675588,0.961899,0.938798,0.964032,0.706714],
+[44,0.809970,0.680630,0.963470,0.960467,0.963735,0.700247],
+[45,0.794292,0.658776,0.953812,0.975300,0.951649,0.669953],
+[46,0.806694,0.676016,0.955231,0.981404,0.952477,0.684787],
+[47,0.772358,0.629140,0.952499,0.930409,0.954594,0.660208],
+[48,0.781109,0.640836,0.946533,0.975503,0.943393,0.651318],
+[49,0.797915,0.663776,0.952667,0.984724,0.949306,0.670682],
+[50,0.792455,0.656253,0.949799,0.968692,0.947724,0.670474],
+[51,0.812651,0.684424,0.960861,0.960297,0.960916,0.704356],
+[52,0.808818,0.679005,0.958450,0.973466,0.956960,0.691809],
+[53,0.812472,0.684170,0.962280,0.953186,0.963133,0.707959],
+[54,0.783584,0.644174,0.949066,0.981963,0.945657,0.651888],
+[55,0.707969,0.547950,0.963821,0.828959,0.971354,0.617799],
+[56,0.788947,0.651456,0.951050,0.966317,0.949453,0.666593],
+[57,0.806758,0.676106,0.956543,0.977635,0.954386,0.686728],
+[58,0.764693,0.619031,0.983810,0.896982,0.986434,0.666409],
+[59,0.787176,0.649043,0.951584,0.984894,0.948253,0.655569],
+[60,0.802138,0.669642,0.955383,0.957203,0.955193,0.690310],
+[61,0.790976,0.654227,0.949387,0.984162,0.945638,0.661188],
+[62,0.715035,0.556463,0.980103,0.747715,0.988129,0.685092],
+[63,0.813742,0.685974,0.963104,0.966868,0.962762,0.702487],
+[64,0.789179,0.651771,0.954102,0.966856,0.952858,0.666667],
+[65,0.779857,0.639153,0.949570,0.976480,0.946860,0.649146],
+[66,0.774430,0.631894,0.946533,0.982522,0.942825,0.639078],
+[67,0.807320,0.676896,0.960159,0.956963,0.960465,0.698149],
+[68,0.767763,0.623064,0.945038,0.979921,0.941473,0.631121],
+[69,0.798548,0.664652,0.955124,0.969561,0.953666,0.678817],
+[70,0.798057,0.663972,0.954971,0.982311,0.952248,0.672006],
+[71,0.791896,0.655487,0.950470,0.974747,0.947872,0.666811],
+[72,0.784244,0.645066,0.955872,0.969384,0.954653,0.658482],
+[73,0.756489,0.608349,0.945313,0.979244,0.942090,0.616296],
+[74,0.760852,0.614013,0.967972,0.827099,0.977219,0.704430],
+[75,0.743071,0.591180,0.958130,0.947922,0.958826,0.611026],
+[76,0.788517,0.650869,0.957397,0.968552,0.956401,0.664921],
+[77,0.779465,0.638626,0.947495,0.982391,0.943855,0.646021],
+[78,0.753527,0.604528,0.940826,0.951983,0.939655,0.623541],
+[79,0.695033,0.532606,0.973206,0.909132,0.975432,0.562553],
+[80,0.786855,0.648608,0.957047,0.971942,0.955724,0.660985],
+[81,0.769755,0.625692,0.945313,0.965667,0.943184,0.639927],
+[82,0.668669,0.502256,0.949509,0.837892,0.956735,0.556315],
+[83,0.722524,0.565587,0.937592,0.942812,0.937099,0.585680],
+[84,0.794766,0.659429,0.957397,0.967603,0.956446,0.674317],
+[85,0.766303,0.621144,0.952591,0.966420,0.951381,0.634845],
+[86,0.789990,0.652878,0.962738,0.933726,0.965092,0.684603],
+[87,0.780604,0.640156,0.946564,0.988105,0.942142,0.645128],
+[88,0.801487,0.668734,0.956802,0.967332,0.955759,0.684185],
+[89,0.795583,0.660555,0.955933,0.963979,0.955147,0.677272],
+[90,0.736180,0.582504,0.936646,0.967758,0.933518,0.594032],
+[91,0.745133,0.593794,0.952057,0.938113,0.953183,0.618003],
+[92,0.771463,0.627953,0.945206,0.969605,0.942633,0.640562],
+[93,0.323802,0.193177,0.973297,0.207528,0.997638,0.736380],
+[94,0.783241,0.643711,0.957687,0.932266,0.959958,0.675293],
+[95,0.790427,0.653477,0.953766,0.985172,0.950716,0.659968],
+[96,0.772927,0.629894,0.951828,0.977087,0.949514,0.639338],
+[97,0.813654,0.685849,0.968597,0.937409,0.971058,0.718765],
+[98,0.717956,0.560009,0.968506,0.753586,0.980580,0.685543],
+[99,0.713882,0.555068,0.958267,0.939427,0.959373,0.575671],
+[100,0.773506,0.630664,0.941666,0.994061,0.935831,0.633049],
+[101,0.786057,0.647524,0.964600,0.950067,0.965667,0.670337],
+[102,0.546032,0.375546,0.980362,0.480447,0.992961,0.632353],
+[103,0.785308,0.646508,0.971191,0.925241,0.973966,0.682141],
+[104,0.786505,0.648132,0.957901,0.954008,0.958245,0.669036],
+[105,0.512605,0.344633,0.982300,0.418381,0.995131,0.661605],
+[106,0.785430,0.646673,0.952271,0.975464,0.949989,0.657366],
+[107,0.768727,0.624336,0.969803,0.935970,0.971720,0.652191],
+[108,0.794347,0.658852,0.952484,0.982359,0.949406,0.666741],
+[109,0.781025,0.640722,0.972672,0.954858,0.973630,0.660736],
+[110,0.463934,0.302028,0.944321,0.851672,0.947018,0.318797],
+[111,0.512959,0.344953,0.928604,0.836672,0.932930,0.369859],
+[112,0.475539,0.311939,0.936859,0.899329,0.938093,0.323225],
+[113,0.555597,0.384655,0.944931,0.922699,0.945793,0.397463],
+[114,0.434764,0.277763,0.959808,0.788327,0.963238,0.300148],
+[115,0.690936,0.527810,0.924606,0.948480,0.922278,0.543388],
+[116,0.727039,0.571140,0.935196,0.880311,0.941162,0.619225],
+[117,0.730091,0.574917,0.943680,0.900108,0.947708,0.614098],
+[118,0.728708,0.573203,0.928696,0.883073,0.934245,0.620281],
+[119,0.673429,0.507646,0.932693,0.923827,0.933414,0.529823],
+];
+
+const clinRaw = [
+["0005_im.png",9508,0.1451,0.1451,11503,0.1755,0.1755],
+["0009_im.png",9678,0.1477,0.1477,11496,0.1754,0.1754],
+["0013_im.png",9248,0.1411,0.1411,11188,0.1707,0.1707],
+["0015_im.png",9065,0.1383,0.1383,10850,0.1656,0.1656],
+["0016_im.png",7427,0.1133,0.1133,10228,0.1561,0.1561],
+["0022_im.png",9391,0.1433,0.1433,10683,0.163,0.163],
+["0023_im.png",9711,0.1482,0.1482,11364,0.1734,0.1734],
+["0060_im.png",6701,0.1022,0.1022,7740,0.1181,0.1181],
+["0067_im.png",7752,0.1183,0.1183,9378,0.1431,0.1431],
+["0075_im.png",8179,0.1248,0.1248,9175,0.14,0.14],
+["0076_im.png",7151,0.1091,0.1091,8158,0.1245,0.1245],
+["0084_im.png",6049,0.0923,0.0923,6665,0.1017,0.1017],
+["0089_im.png",7229,0.1103,0.1103,8290,0.1265,0.1265],
+["0093_im.png",8043,0.1227,0.1227,9350,0.1427,0.1427],
+["0097_im.png",8204,0.1252,0.1252,10851,0.1656,0.1656],
+["0101_im.png",9225,0.1408,0.1408,10245,0.1563,0.1563],
+["0107_im.png",7551,0.1152,0.1152,8581,0.1309,0.1309],
+["0117_im.png",7976,0.1217,0.1217,9389,0.1433,0.1433],
+["0119_im.png",8642,0.1319,0.1319,9957,0.1519,0.1519],
+["0120_im.png",7783,0.1188,0.1188,8570,0.1308,0.1308],
+];
+
+/* ══════════════════════════════════════════
+   HELPERS
+══════════════════════════════════════════ */
+const avg = arr => arr.reduce((a,b)=>a+b,0)/arr.length;
+const col = (data, i) => data.map(r=>r[i]);
+
+const unetDice = col(unetRaw,1), attDice = col(attRaw,1);
+const unetIou  = col(unetRaw,2), attIou  = col(attRaw,2);
+const unetAcc  = col(unetRaw,3), attAcc  = col(attRaw,3);
+const unetSens = col(unetRaw,4), attSens = col(attRaw,4);
+const unetSpec = col(unetRaw,5), attSpec = col(attRaw,5);
+const unetPrec = col(unetRaw,6), attPrec = col(attRaw,6);
+
+const UNET_COLOR = 'rgba(88,166,255,0.85)';
+const ATT_COLOR  = 'rgba(247,129,102,0.85)';
+const UNET_FILL  = 'rgba(88,166,255,0.12)';
+const ATT_FILL   = 'rgba(247,129,102,0.12)';
+const GRID_COLOR = 'rgba(48,54,61,0.6)';
+
+Chart.defaults.color = '#8b949e';
+Chart.defaults.borderColor = GRID_COLOR;
+Chart.defaults.font.family = 'Inter';
+
+/* ══════════════════════════════════════════
+   SUMMARY CARDS
+══════════════════════════════════════════ */
+function val(v){ return (v*100).toFixed(2)+'%'; }
+
+const metrics = [
+  {label:'Ort. Dice (UNet)',   value: val(avg(unetDice)), cls:'blue'},
+  {label:'Ort. Dice (Att.)',   value: val(avg(attDice)),  cls:'red'},
+  {label:'Ort. IoU (UNet)',    value: val(avg(unetIou)),  cls:'blue'},
+  {label:'Ort. IoU (Att.)',    value: val(avg(attIou)),   cls:'red'},
+  {label:'Ort. Acc (UNet)',    value: val(avg(unetAcc)),  cls:'blue'},
+  {label:'Ort. Acc (Att.)',    value: val(avg(attAcc)),   cls:'red'},
+];
+
+const cardsEl = document.getElementById('summary-cards');
+metrics.forEach(m => {
+  cardsEl.innerHTML += `
+  <div class="card">
+    <div class="card-label">${m.label}</div>
+    <div class="card-value ${m.cls}">${m.value}</div>
+  </div>`;
+});
+
+/* ══════════════════════════════════════════
+   TAB SWITCHING
+══════════════════════════════════════════ */
+function switchTab(name){
+  document.querySelectorAll('.panel').forEach(p=>p.classList.remove('active'));
+  document.querySelectorAll('.tab').forEach(t=>t.classList.remove('active'));
+  document.getElementById('panel-'+name).classList.add('active');
+  event.target.classList.add('active');
+}
+
+/* ══════════════════════════════════════════
+   CHART OPTIONS HELPER
+══════════════════════════════════════════ */
+function lineOpts(title, yLabel=''){
+  return {
+    responsive: true,
+    animation: { duration: 600, easing:'easeOutQuart' },
+    plugins: {
+      legend:{ display:false },
+      tooltip:{ mode:'index', intersect:false }
+    },
+    scales:{
+      x:{ grid:{color:GRID_COLOR}, ticks:{maxTicksLimit:20, font:{size:10}} },
+      y:{ grid:{color:GRID_COLOR}, title:{display:!!yLabel,text:yLabel,font:{size:11}} }
+    }
+  };
+}
+
+/* ══════════════════════════════════════════
+   RADAR CHART
+══════════════════════════════════════════ */
+new Chart(document.getElementById('radarChart'), {
+  type:'radar',
+  data:{
+    labels:['Dice','IoU','Accuracy','Sensitivity','Specificity','Precision'],
+    datasets:[
+      {label:'UNet', data:[avg(unetDice),avg(unetIou),avg(unetAcc),avg(unetSens),avg(unetSpec),avg(unetPrec)].map(v=>+(v*100).toFixed(2)),
+        borderColor:UNET_COLOR, backgroundColor:UNET_FILL, pointBackgroundColor:UNET_COLOR, borderWidth:2},
+      {label:'AttentionUNet', data:[avg(attDice),avg(attIou),avg(attAcc),avg(attSens),avg(attSpec),avg(attPrec)].map(v=>+(v*100).toFixed(2)),
+        borderColor:ATT_COLOR,  backgroundColor:ATT_FILL,  pointBackgroundColor:ATT_COLOR,  borderWidth:2},
+    ]
+  },
+  options:{
+    responsive:true,
+    animation:{duration:700},
+    plugins:{legend:{position:'top',labels:{color:'#e6edf3',font:{size:12}}}},
+    scales:{r:{
+      angleLines:{color:GRID_COLOR},
+      grid:{color:GRID_COLOR},
+      pointLabels:{color:'#e6edf3',font:{size:11}},
+      ticks:{backdropColor:'transparent',color:'#8b949e',font:{size:9}},
+      suggestedMin:60,suggestedMax:100
+    }}
+  }
+});
+
+/* ══════════════════════════════════════════
+   BOX-LIKE (Scatter quartile) → use bar bins
+══════════════════════════════════════════ */
+function histBins(arr, bins=12){
+  const mn=Math.min(...arr), mx=Math.max(...arr), w=(mx-mn)/bins;
+  const counts=Array(bins).fill(0);
+  arr.forEach(v=>{ let i=Math.min(Math.floor((v-mn)/w),bins-1); counts[i]++; });
+  return {labels:Array.from({length:bins},(_,i)=>((mn+i*w)*100).toFixed(1)+'%'), counts};
+}
+const unetH = histBins(unetDice);
+const attH  = histBins(attDice);
+
+new Chart(document.getElementById('boxChart'),{
+  type:'bar',
+  data:{
+    labels: unetH.labels,
+    datasets:[
+      {label:'UNet', data:unetH.counts, backgroundColor:UNET_COLOR, borderRadius:4},
+      {label:'AttentionUNet', data:attH.counts, backgroundColor:ATT_COLOR, borderRadius:4}
+    ]
+  },
+  options:{
+    responsive:true,
+    animation:{duration:600},
+    plugins:{legend:{position:'top',labels:{color:'#e6edf3'}}},
+    scales:{
+      x:{grid:{color:GRID_COLOR},ticks:{font:{size:10}}},
+      y:{grid:{color:GRID_COLOR},title:{display:true,text:'Frekans'}}
+    }
+  }
+});
+
+/* ══════════════════════════════════════════
+   DICE LINE
+══════════════════════════════════════════ */
+const xLabels = unetRaw.map(r=>r[0]);
+
+new Chart(document.getElementById('diceLineChart'),{
+  type:'line',
+  data:{
+    labels:xLabels,
+    datasets:[
+      {label:'UNet', data:unetDice, borderColor:UNET_COLOR, backgroundColor:'transparent', borderWidth:1.5, pointRadius:0, tension:.3},
+      {label:'Att.',  data:attDice,  borderColor:ATT_COLOR,  backgroundColor:'transparent', borderWidth:1.5, pointRadius:0, tension:.3}
+    ]
+  },
+  options: lineOpts('Dice')
+});
+
+/* ══════════════════════════════════════════
+   IoU LINE
+══════════════════════════════════════════ */
+new Chart(document.getElementById('iouLineChart'),{
+  type:'line',
+  data:{
+    labels:xLabels,
+    datasets:[
+      {label:'UNet', data:unetIou, borderColor:UNET_COLOR, backgroundColor:'transparent', borderWidth:1.5, pointRadius:0, tension:.3},
+      {label:'Att.',  data:attIou,  borderColor:ATT_COLOR,  backgroundColor:'transparent', borderWidth:1.5, pointRadius:0, tension:.3}
+    ]
+  },
+  options: lineOpts('IoU')
+});
+
+/* ══════════════════════════════════════════
+   SENSITIVITY + PRECISION
+══════════════════════════════════════════ */
+new Chart(document.getElementById('sensChart'),{
+  type:'bar',
+  data:{
+    labels: Array.from({length:Math.min(50,xLabels.length)},(_,i)=>i+1),
+    datasets:[
+      {label:'UNet', data:unetSens.slice(0,50), backgroundColor:UNET_COLOR, borderRadius:3},
+      {label:'Att.',  data:attSens.slice(0,50),  backgroundColor:ATT_COLOR,  borderRadius:3}
+    ]
+  },
+  options:{
+    responsive:true, animation:{duration:500},
+    plugins:{legend:{position:'top',labels:{color:'#e6edf3'}}},
+    scales:{x:{grid:{color:GRID_COLOR}},y:{grid:{color:GRID_COLOR},min:.2,max:1.05}}
+  }
+});
+
+new Chart(document.getElementById('precChart'),{
+  type:'bar',
+  data:{
+    labels: Array.from({length:Math.min(50,xLabels.length)},(_,i)=>i+1),
+    datasets:[
+      {label:'UNet', data:unetPrec.slice(0,50), backgroundColor:UNET_COLOR, borderRadius:3},
+      {label:'Att.',  data:attPrec.slice(0,50),  backgroundColor:ATT_COLOR,  borderRadius:3}
+    ]
+  },
+  options:{
+    responsive:true, animation:{duration:500},
+    plugins:{legend:{position:'top',labels:{color:'#e6edf3'}}},
+    scales:{x:{grid:{color:GRID_COLOR}},y:{grid:{color:GRID_COLOR},min:.2,max:1.05}}
+  }
+});
+
+/* ══════════════════════════════════════════
+   CLINICAL – Grouped Bar
+══════════════════════════════════════════ */
+const clinLabels = clinRaw.map(r=>r[0].replace('_im.png',''));
+const unetPx     = clinRaw.map(r=>r[1]);
+const attPx      = clinRaw.map(r=>r[4]);
+
+new Chart(document.getElementById('clinBarChart'),{
+  type:'bar',
+  data:{
+    labels:clinLabels,
+    datasets:[
+      {label:'UNet Piksel', data:unetPx, backgroundColor:UNET_COLOR, borderRadius:3},
+      {label:'Att. Piksel',  data:attPx,  backgroundColor:ATT_COLOR,  borderRadius:3}
+    ]
+  },
+  options:{
+    responsive:true,animation:{duration:600},
+    plugins:{legend:{position:'top',labels:{color:'#e6edf3'}}},
+    scales:{
+      x:{grid:{color:GRID_COLOR},ticks:{font:{size:10}}},
+      y:{grid:{color:GRID_COLOR},title:{display:true,text:'Damar Piksel Sayısı'}}
+    }
+  }
+});
+
+/* ── Clinical Histogram ── */
+const unetRatio = clinRaw.map(r=>r[2]);
+const attRatio  = clinRaw.map(r=>r[5]);
+const uHr = histBins(unetRatio,8), aHr = histBins(attRatio,8);
+
+new Chart(document.getElementById('clinHistChart'),{
+  type:'bar',
+  data:{
+    labels: uHr.labels,
+    datasets:[
+      {label:'UNet', data:uHr.counts, backgroundColor:UNET_COLOR, borderRadius:4},
+      {label:'Att.',  data:aHr.counts, backgroundColor:ATT_COLOR,  borderRadius:4}
+    ]
+  },
+  options:{
+    responsive:true,animation:{duration:500},
+    plugins:{legend:{position:'top',labels:{color:'#e6edf3'}}},
+    scales:{x:{grid:{color:GRID_COLOR}},y:{grid:{color:GRID_COLOR},title:{display:true,text:'Frekans'}}}
+  }
+});
+
+/* ── Scatter ── */
+new Chart(document.getElementById('scatterChart'),{
+  type:'scatter',
+  data:{
+    datasets:[{
+      label:'Piksel Sayısı',
+      data: clinRaw.map(r=>({x:r[1],y:r[4]})),
+      backgroundColor:UNET_COLOR, pointRadius:6
+    }]
+  },
+  options:{
+    responsive:true,animation:{duration:500},
+    plugins:{
+      legend:{display:false},
+      tooltip:{callbacks:{label:ctx=>`U:${ctx.raw.x} / A:${ctx.raw.y}`}}
+    },
+    scales:{
+      x:{grid:{color:GRID_COLOR},title:{display:true,text:'UNet Piksel Sayısı'}},
+      y:{grid:{color:GRID_COLOR},title:{display:true,text:'AttentionUNet Piksel Sayısı'}}
+    }
+  }
+});
+
+/* ══════════════════════════════════════════
+   TABLE
+══════════════════════════════════════════ */
+const tbody = document.getElementById('tableBody');
+unetRaw.forEach((ur, i) => {
+  const ar = attRaw[i];
+  const addRow = (row, model, cls, badgeCls) => {
+    const tr = document.createElement('tr');
+    tr.innerHTML = `
+      <td>${row[0]}</td>
+      <td><span class="badge ${badgeCls}">${model}</span></td>
+      <td>${(row[1]*100).toFixed(2)}%</td>
+      <td>${(row[2]*100).toFixed(2)}%</td>
+      <td>${(row[3]*100).toFixed(2)}%</td>
+      <td>${(row[4]*100).toFixed(2)}%</td>
+      <td>${(row[5]*100).toFixed(2)}%</td>
+      <td>${(row[6]*100).toFixed(2)}%</td>
+    `;
+    tbody.appendChild(tr);
+  };
+  addRow(ur, 'UNet',          'blue', 'badge-blue');
+  addRow(ar, 'AttentionUNet', 'red',  'badge-red');
+});
+</script>
+</body>
+</html>
