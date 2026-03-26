@@ -1,0 +1,377 @@
+:root {
+    --bg-dark: #0f172a;
+    --text-main: #f8fafc;
+    --text-muted: #94a3b8;
+    --primary: #3b82f6;
+    --primary-hover: #2563eb;
+    --glass-bg: rgba(30, 41, 59, 0.7);
+    --glass-border: rgba(255, 255, 255, 0.1);
+    --danger: #ef4444;
+}
+
+* {
+    box-sizing: border-box;
+    margin: 0;
+    padding: 0;
+}
+
+body {
+    font-family: 'Inter', sans-serif;
+    background-color: var(--bg-dark);
+    color: var(--text-main);
+    min-height: 100vh;
+    overflow-x: hidden;
+    position: relative;
+}
+
+/* Background Animation */
+.background-blobs {
+    position: fixed;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    z-index: -1;
+    overflow: hidden;
+}
+
+.blob {
+    position: absolute;
+    filter: blur(80px);
+    opacity: 0.5;
+    border-radius: 50%;
+    animation: float 10s infinite alternate ease-in-out;
+}
+
+.blob-1 {
+    width: 400px;
+    height: 400px;
+    background: #3b82f6;
+    top: -100px;
+    left: -100px;
+}
+
+.blob-2 {
+    width: 350px;
+    height: 350px;
+    background: #8b5cf6;
+    bottom: -50px;
+    right: -50px;
+    animation-delay: -5s;
+}
+
+@keyframes float {
+    0% {
+        transform: translate(0, 0) scale(1);
+    }
+
+    100% {
+        transform: translate(30px, 50px) scale(1.1);
+    }
+}
+
+/* Layout */
+.container {
+    max-width: 900px;
+    margin: 0 auto;
+    padding: 2rem;
+}
+
+header {
+    text-align: center;
+    margin-bottom: 3rem;
+}
+
+header h1 {
+    font-size: 2.5rem;
+    font-weight: 700;
+    background: linear-gradient(to right, #60a5fa, #a78bfa);
+    -webkit-background-clip: text;
+    background-clip: text;
+    -webkit-text-fill-color: transparent;
+    margin-bottom: 0.5rem;
+}
+
+header p {
+    color: var(--text-muted);
+    font-size: 1.1rem;
+}
+
+/* Glass Card */
+.glass-card {
+    background: var(--glass-bg);
+    backdrop-filter: blur(12px);
+    border: 1px solid var(--glass-border);
+    border-radius: 1rem;
+    padding: 2rem;
+    margin-bottom: 2rem;
+    box-shadow: 0 20px 40px rgba(0, 0, 0, 0.2);
+}
+
+.glass-card h2 {
+    font-size: 1.25rem;
+    margin-bottom: 1.5rem;
+    font-weight: 600;
+}
+
+/* Upload Section */
+.drop-zone {
+    border: 2px dashed var(--glass-border);
+    border-radius: 0.75rem;
+    padding: 3rem;
+    text-align: center;
+    cursor: pointer;
+    transition: all 0.3s ease;
+    background: rgba(15, 23, 42, 0.4);
+    min-height: 200px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    position: relative;
+    overflow: hidden;
+}
+
+.drop-zone:hover,
+.drop-zone.dragover {
+    border-color: var(--primary);
+    background: rgba(59, 130, 246, 0.1);
+}
+
+.drop-zone-content {
+    color: var(--text-muted);
+}
+
+.drop-zone-content svg {
+    margin-bottom: 1rem;
+    color: var(--primary);
+}
+
+.drop-zone-content span {
+    color: var(--primary);
+    font-weight: 500;
+}
+
+.preview {
+    max-width: 100%;
+    max-height: 250px;
+    border-radius: 0.5rem;
+    object-fit: contain;
+}
+
+/* Button */
+.btn {
+    width: 100%;
+    padding: 1rem;
+    border: none;
+    border-radius: 0.5rem;
+    font-size: 1rem;
+    font-weight: 600;
+    cursor: pointer;
+    transition: all 0.2s;
+    margin-top: 1.5rem;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+}
+
+.primary-btn {
+    background: var(--primary);
+    color: white;
+}
+
+.primary-btn:hover:not(:disabled) {
+    background: var(--primary-hover);
+    transform: translateY(-2px);
+}
+
+.primary-btn:disabled {
+    opacity: 0.5;
+    cursor: not-allowed;
+}
+
+/* Spinner */
+.spinner {
+    width: 20px;
+    height: 20px;
+    border: 3px solid rgba(255, 255, 255, 0.3);
+    border-radius: 50%;
+    border-top-color: white;
+    animation: spin 1s ease-in-out infinite;
+}
+
+@keyframes spin {
+    to {
+        transform: rotate(360deg);
+    }
+}
+
+.error-msg {
+    color: var(--danger);
+    text-align: center;
+    margin-top: 1rem;
+    font-size: 0.9rem;
+}
+
+/* Results */
+.results-grid {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 1.5rem;
+    margin-bottom: 2rem;
+}
+
+.image-card {
+    background: rgba(0, 0, 0, 0.2);
+    border-radius: 0.75rem;
+    padding: 1rem;
+    text-align: center;
+}
+
+.image-card h3 {
+    font-size: 0.9rem;
+    color: var(--text-muted);
+    margin-bottom: 1rem;
+}
+
+.image-card img {
+    width: 100%;
+    border-radius: 0.5rem;
+}
+
+.clinical-stats h3 {
+    font-size: 1.1rem;
+    margin-bottom: 1rem;
+}
+
+.stats-grid {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 1rem;
+}
+
+.stat-box {
+    background: rgba(255, 255, 255, 0.05);
+    padding: 1rem;
+    border-radius: 0.5rem;
+    text-align: center;
+    border: 1px solid rgba(255, 255, 255, 0.05);
+}
+
+.stat-label {
+    display: block;
+    font-size: 0.8rem;
+    color: var(--text-muted);
+    margin-bottom: 0.5rem;
+}
+
+.stat-value {
+    display: block;
+    font-size: 1.25rem;
+    font-weight: 600;
+    color: var(--primary);
+}
+
+@media (max-width: 600px) {
+
+    .results-grid,
+    .stats-grid {
+        grid-template-columns: 1fr;
+    }
+}
+
+/* ── RetinAI Branding ── */
+.brand-badge {
+    display: block;
+    text-align: center;
+    font-size: 3.2rem;
+    font-weight: 700;
+    font-family: 'Playfair Display', 'Georgia', serif;
+    font-style: italic;
+    letter-spacing: 0.06em;
+    background: linear-gradient(135deg, #ffffff 0%, #a78bfa 60%, #60a5fa 100%);
+    -webkit-background-clip: text;
+    background-clip: text;
+    -webkit-text-fill-color: transparent;
+    margin-bottom: 0.3rem;
+    line-height: 1;
+}
+
+.slogan {
+    font-size: 1.0rem;
+    font-weight: 400;
+    color: var(--text-muted);
+    letter-spacing: 0.01em;
+    margin-bottom: 0.3rem;
+}
+
+.brand-subtitle {
+    color: var(--text-muted);
+    font-size: 0.95rem;
+    margin-top: 0.25rem;
+}
+
+/* ── Info / Notification Boxes ── */
+.info-box {
+    border-radius: 0.75rem;
+    padding: 1rem 1.25rem;
+    margin-top: 1.25rem;
+    font-size: 0.9rem;
+    line-height: 1.6;
+    border-left: 4px solid;
+}
+
+.info-box-header {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    margin-bottom: 0.5rem;
+    font-size: 0.95rem;
+}
+
+.info-icon {
+    font-size: 1.1rem;
+}
+
+/* Commentary box – soft indigo/violet */
+.commentary-box {
+    background: rgba(99, 102, 241, 0.08);
+    border-color: #6366f1;
+    color: #c7d2fe;
+}
+
+.commentary-box .info-box-header strong {
+    color: #a5b4fc;
+}
+
+/* Clinical info box – teal / cyan */
+.clinical-info-box {
+    background: rgba(20, 184, 166, 0.08);
+    border-color: #14b8a6;
+    color: #99f6e4;
+}
+
+.clinical-info-box .info-box-header strong {
+    color: #2dd4bf;
+}
+
+/* Warning box – amber / yellow */
+.warning-box {
+    background: rgba(245, 158, 11, 0.1);
+    border-color: #f59e0b;
+    color: #fde68a;
+}
+
+.warning-box .info-box-header strong {
+    color: #fbbf24;
+}
+
+/* Image quality box – orange */
+.quality-box {
+    background: rgba(249, 115, 22, 0.08);
+    border-color: #f97316;
+    color: #fed7aa;
+}
+
+.quality-box .info-box-header strong {
+    color: #fb923c;
+}
