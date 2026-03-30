@@ -1,0 +1,114 @@
+<!DOCTYPE html>
+<html lang="tr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>RetinAI – AI Powered Retinal Vessel Analysis</title>
+    <!-- Google Fonts -->
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=Playfair+Display:ital,wght@1,700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="style.css">
+</head>
+<body>
+    <div class="background-blobs">
+        <div class="blob blob-1"></div>
+        <div class="blob blob-2"></div>
+    </div>
+
+    <div class="container">
+        <header>
+            <div class="brand-badge">retinai</div>
+            <h1>Retinanın Akıllı Yorumu</h1>
+            <p class="slogan">AI Powered Retinal Vessel Analysis</p>
+            <p class="brand-subtitle">Attention U-Net destekli damar segmentasyon sistemi</p>
+        </header>
+
+        <main>
+            <section class="upload-section glass-card">
+                <h2>Orijinal Görüntü Yükle</h2>
+                <div class="drop-zone" id="dropZone">
+                    <input type="file" id="fileInput" accept="image/png, image/jpeg" hidden>
+                    <div class="drop-zone-content" id="dropZoneContent">
+                        <svg width="40" height="40" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                            <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"></path>
+                            <polyline points="17 8 12 3 7 8"></polyline>
+                            <line x1="12" y1="3" x2="12" y2="15"></line>
+                        </svg>
+                        <p>Sürükle bırak <br>veya <span>tıklayarak seç</span></p>
+                    </div>
+                    <img id="previewImage" class="preview" hidden>
+                </div>
+                <button id="analyzeBtn" class="btn primary-btn" disabled>
+                    <span class="btn-text">Analiz Et</span>
+                    <span class="spinner" hidden></span>
+                </button>
+                <p id="errorMsg" class="error-msg" hidden></p>
+            </section>
+
+            <section id="resultSection" class="result-section glass-card" hidden>
+                <h2>Sonuçlar</h2>
+                <div class="results-grid">
+                    <div class="image-card">
+                        <h3>Orijinal</h2>
+                        <img id="resOriginal" src="" alt="Orijinal">
+                    </div>
+                    <div class="image-card">
+                        <h3>Maske (Tahmin)</h2>
+                        <img id="resMask" src="" alt="Maske">
+                    </div>
+                </div>
+
+                <div class="clinical-stats">
+                    <h3>Klinik Özellikler</h3>
+                    <div class="stats-grid">
+                        <div class="stat-box">
+                            <span class="stat-label">Damar Piksel Sayısı</span>
+                            <span class="stat-value" id="statPx">-</span>
+                        </div>
+                        <div class="stat-box">
+                            <span class="stat-label">Damar Alan Oranı</span>
+                            <span class="stat-value" id="statRatio">-</span>
+                        </div>
+                        <div class="stat-box">
+                            <span class="stat-label">Damar Yoğunluğu</span>
+                            <span class="stat-value" id="statDensity">-</span>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Commentary: Vessel Density -->
+                <div class="info-box commentary-box">
+                    <div class="info-box-header"><span class="info-icon">🔬</span><strong>Damar Yapısı Değerlendirmesi:</strong></div>
+                    <p>Damar yoğunluğu değeri, retina üzerindeki vasküler dağılım hakkında bilgi vermektedir. Hesaplanan oran, damar ağının görüntüdeki yayılım düzeyini yansıtmaktadır. Düşük değerler damar görünürlüğünde azalma, görüntü kalitesinde düşüklük veya segmentasyon kısıtlılığı ile ilişkili olabilir.</p>
+                </div>
+
+                <!-- Commentary: Vessel Area Ratio -->
+                <div class="info-box commentary-box">
+                    <div class="info-box-header"><span class="info-icon">📊</span><strong>Vasküler Alan Yorumu:</strong></div>
+                    <p>Damar alan oranı, retina yüzeyinde damar yapılarına ait segmentlerin toplam dağılımını göstermektedir. Bu değerin beklenenden düşük olması ince damarların yeterince seçilememesi, yüksek olması ise geniş damar alanlarının baskınlığı veya eşikleme kaynaklı fazladan işaretlemeler ile ilişkili olabilir.</p>
+                </div>
+
+                <!-- Clinical Info Box -->
+                <div class="info-box clinical-info-box">
+                    <div class="info-box-header"><span class="info-icon">🩺</span><strong>Klinik Bilgilendirme:</strong></div>
+                    <p>Bu analiz, retina damar yapılarının otomatik olarak belirlenmesine yardımcı olmak amacıyla geliştirilmiş yapay zekâ destekli bir değerlendirme sunmaktadır. Elde edilen sonuçlar ön değerlendirme niteliğindedir.</p>
+                </div>
+
+                <!-- Warning Box -->
+                <div class="info-box warning-box">
+                    <div class="info-box-header"><span class="info-icon">⚠️</span><strong>Klinik Uyarı:</strong></div>
+                    <p>Bu sistem tek başına tanı koydurucu değildir. Sonuçlar, uzman hekim değerlendirmesi ve diğer klinik bulgular ile birlikte yorumlanmalıdır.</p>
+                </div>
+
+                <!-- Image Quality Note -->
+                <div class="info-box quality-box">
+                    <div class="info-box-header"><span class="info-icon">🖼️</span><strong>Görüntü Kalitesi Notu:</strong></div>
+                    <p>Fundus görüntüsünde kontrast düşüklüğü, aydınlatma yetersizliği veya bulanıklık bulunması halinde damar segmentasyonu doğruluğu azalabilir. Bu durum özellikle ince damar yapıların gösteriminde belirgin hale gelir.</p>
+                </div>
+
+            </section>
+        </main>
+    </div>
+
+    <script src="script.js"></script>
+</body>
+</html>
