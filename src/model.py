@@ -62,13 +62,9 @@ class UNet(nn.Module):
 # Attention Gate
 # ---------------------------------------------------------------------------
 
+# Attention Gate: decoder'dan gelen g sinyali ile encoder skip feature'ı x'i karşılaştırıp
+# her piksel için 0-1 arası bir ağırlık (alpha) üretir, sonra x * alpha döner.
 class AttentionGate(nn.Module):
-    """
-    Soft attention gate.
-    g : decoder gating signal  (coarser, deeper features)
-    x : encoder skip features  (finer, shallower features)
-    Çıktı: α · x  (α ∈ [0,1] per-spatial-location)
-    """
 
     def __init__(self, F_g: int, F_x: int, F_int: int):
         super().__init__()
@@ -101,12 +97,9 @@ class AttentionGate(nn.Module):
 # Attention U-Net
 # ---------------------------------------------------------------------------
 
+# Attention U-Net: standart U-Net'ten farkı decoder kısmında
+# skip connection'lar doğrudan gelmez, önce AttentionGate'ten geçer.
 class AttentionUNet(nn.Module):
-    """
-    Attention U-Net (Oktay et al., 2018).
-    UNet ile aynı encoder/bottleneck; decoder'da her skip connection
-    AttentionGate ile filtrelenir.
-    """
 
     def __init__(self, in_ch: int = 3, out_ch: int = 1,
                  features: tuple = (64, 128, 256, 512)):

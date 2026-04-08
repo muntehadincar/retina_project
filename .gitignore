@@ -30,3 +30,17 @@ env/
 # OS
 .DS_Store
 Thumbs.db
+
+# Runtime klasörleri (yüklenen/üretilen dosyalar)
+retina_system/uploads/*
+retina_system/outputs/*
+!retina_system/uploads/.gitkeep
+!retina_system/outputs/.gitkeep
+
+# Büyük çıktı dosyaları
+results/clinical/
+results/*.gif
+*.png
+*.jpg
+!retina_system/frontend/**/*.png
+!retina_system/frontend/**/*.jpg

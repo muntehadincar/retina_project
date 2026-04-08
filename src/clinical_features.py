@@ -1,24 +1,6 @@
 # -*- coding: utf-8 -*-
-"""
-clinical_features.py
-====================
-Her test görüntüsü için klinik damar özellikleri çıkarır:
-
-  - vessel_pixel_count  : binary maskede beyaz (damar) piksel sayısı
-  - vessel_area_ratio   : damar pikseli / toplam piksel
-  - vessel_density      : vessel_area_ratio ile aynı (alan yoğunluğu)
-
-Her iki model (UNet, AttentionUNet) için ayrı CSV üretir;
-ayrıca iki modeli yan yana gösteren bir karşılaştırma CSV'si kaydeder.
-
-Çıktılar:
-  results/clinical/unet_clinical.csv
-  results/clinical/attention_unet_clinical.csv
-  results/clinical/clinical_comparison.csv
-
-Kullanım:
-  $env:PYTHONUTF8=1; python src/clinical_features.py
-"""
+# Her test görüntüsü için damar özelliklerini hesaplar (piksel sayısı, alan oranı, yoğunluk).
+# UNet ve AttentionUNet için ayrı CSV dosyaları üretir, ayrıca karşılaştırma CSV'si kaydeder.
 
 import os
 import csv
