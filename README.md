@@ -2,7 +2,9 @@
 
 > **Attention U-Net** tabanlı, uçtan uca retinal damar segmentasyonu ve klinik özellik çıkarımı yapan web uygulaması.
 
-![RetinAI Web Arayüzü](assets/web_interface.png)
+### 💻 Arayüzden Görüntüler
+![RetinAI Web Arayüzü - Başlangıç](assets/web_interface.png)
+![RetinAI Analiz Sonucu](assets/web_interface1.png)
 
 ---
 
