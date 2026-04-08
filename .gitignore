@@ -43,5 +43,6 @@ results/clinical/
 results/*.gif
 *.png
 *.jpg
+!assets/**
 !retina_system/frontend/**/*.png
 !retina_system/frontend/**/*.jpg
