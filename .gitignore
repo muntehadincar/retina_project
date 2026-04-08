@@ -12,6 +12,7 @@ build/
 
 # Model ağırlıkları (çok büyük - GitHub'a yükleme)
 results/models/*.pth
+retina_system/models/*.pth
 
 # Veri klasörü (büyük veri seti - isteğe bağlı)
 # Eğer veri setini de yüklemek istiyorsanız bu satırı silin:
