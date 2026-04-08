@@ -149,7 +149,7 @@ $env:PYTHONUTF8=1; python src/clinical_features.py
 ## 📊 Veri Seti
 
 
-- 40 renkli fundus görüntüsü (20 eğitim, 20 test)
+- 1200 renkli fundus görüntüsü
 - 565×584 piksel çözünürlük
 - Manuel damar segmentasyon maskeleri
 
