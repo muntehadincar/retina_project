@@ -58,7 +58,7 @@ retina_project/
 ## 🤖 Model Mimarisi
 
 ### Attention U-Net
-Oktay et al. (2018) makalesine dayanan bu mimari, standart U-Net'e **Attention Gate** ekler. Decoder'daki her skip connection, encoder'dan gelen özellik haritasını dikkat mekanizmasıyla ağırlıklandırarak damar gibi ince yapılara odaklanmayı iyileştirir.
+Standart U-Net'e **Attention Gate** ekler. Decoder'daki her skip connection, encoder'dan gelen özellik haritasını dikkat mekanizmasıyla ağırlıklandırarak damar gibi ince yapılara odaklanmayı iyileştirir.
 
 ```
 Encoder (Down) → Bottleneck → Decoder (Up)
