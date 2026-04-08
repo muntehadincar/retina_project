@@ -148,7 +148,6 @@ $env:PYTHONUTF8=1; python src/clinical_features.py
 
 ## 📊 Veri Seti
 
-[DRIVE (Digital Retinal Images for Vessel Extraction)](https://drive.grand-challenge.org/) veri seti kullanılmıştır.
 
 - 40 renkli fundus görüntüsü (20 eğitim, 20 test)
 - 565×584 piksel çözünürlük
@@ -172,5 +171,5 @@ Görüntüler eğitim öncesinde **CLAHE** (Contrast Limited Adaptive Histogram 
 
 ## 👩‍💻 Geliştirici
 
-**Munteha Dincar**
-Retinal Damar Segmentasyonu — Bitirme Projesi
+**Münteha Dincar**
+retinai Fundus Görüntülerinde Damar Segmentasyonu — Tıp Mühendisliği Bitirme Projesi 2026
