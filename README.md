@@ -25,11 +25,15 @@ Bu proje, göz fundus görüntülerindeki retinal damarları otomatik olarak seg
 ```
 retina_project/
 ├── src/                          # Model eğitim ve değerlendirme kodları
-│   ├── model.py                  # UNet ve Attention U-Net mimarileri (PyTorch)
+│   ├── model.py                  # UNet, AttentionUNet, ResUNet, SegFormerLite, SwinUNet
 │   ├── train.py                  # UNet eğitim döngüsü
-│   ├── train_attention.py        # Attention U-Net eğitim döngüsü
-│   ├── train_compare.py          # İki modeli aynı anda karşılaştırmalı eğitme
-│   ├── evaluate.py               # Test seti değerlendirmesi (Dice, IoU, vb.)
+│   ├── train_attention_standalone.py  # Attention U-Net eğitimi (CSV loglu)
+│   ├── train_resunet.py          # ResUNet eğitimi
+│   ├── train_segformer.py        # SegFormer eğitimi
+│   ├── train_swinunet.py         # Swin-UNet eğitimi
+│   ├── train_compare.py          # UNet vs AttentionUNet karşılaştırmalı eğitim
+│   ├── evaluate.py               # Test seti değerlendirmesi (5 model, Dice, IoU vb.)
+│   ├── plot_multi_compare.py     # 5 model karşılaştırma grafikleri
 │   ├── clinical_features.py      # Klinik özellik çıkarımı ve CSV üretimi
 │   ├── visualize.py              # Tahmin görselleştirme
 │   ├── dataset.py                # Dataset sınıfı
@@ -55,7 +59,17 @@ retina_project/
 
 ---
 
-## 🤖 Model Mimarisi
+## 🤖 Model Mimarileri
+
+Projede **5 farklı segmentasyon mimarisi** karşılaştırmalı olarak eğitilmiş ve değerlendirilmiştir:
+
+| Model | Tür | Parametre | Açıklama |
+|---|---|---|---|
+| **UNet** | CNN | 31.0M | Klasik encoder-decoder mimarisi |
+| **Attention U-Net** | CNN | 34.9M | UNet + Attention Gate ile ince damar odağı |
+| **ResUNet** | CNN | 32.4M | Residual (artık) bağlantılı U-Net |
+| **SegFormer Lite** | Transformer | 1.3M | MiT-inspired DWSConv + MLP decoder |
+| **Swin-UNet** | Transformer | 34.5M | Swin Transformer encoder + CNN decoder |
 
 ### Attention U-Net
 Standart U-Net'e **Attention Gate** ekler. Decoder'daki her skip connection, encoder'dan gelen özellik haritasını dikkat mekanizmasıyla ağırlıklandırarak damar gibi ince yapılara odaklanmayı iyileştirir.
@@ -148,12 +162,29 @@ $env:PYTHONUTF8=1; python src/clinical_features.py
 
 ## 📊 Veri Seti
 
+Bu çalışmada kullanılan retina görüntüleri, 4–83 yaş aralığındaki bireyleri kapsayan ve retina damar segmentasyonu alanında yaygın olarak kullanılan açık erişimli veri setlerinden elde edilmiştir. Veri seti oluşturulurken aşağıdaki veri tabanlarından yararlanılmıştır:
 
-- 1200 renkli fundus görüntüsü
+- **DRIVE** (Digital Retinal Images for Vessel Extraction)
+- **STARE** (Structured Analysis of the Retina)
+- **CHASEDB1** (Child Heart and Health Study in England Database)
+- **FIVES** (Fundus Image Vessel Segmentation)
+
+Bu veri setleri, retina damarlarının otomatik tespiti ve segmentasyonu üzerine gerçekleştirilen akademik çalışmalarda sıklıkla kullanılan ve referans niteliği taşıyan veri kaynaklarıdır.
+
+### Görüntü Özellikleri
+- **600 renkli retina fundus görüntüsü** + **600 manuel damar segmentasyon maskesi**
 - 565×584 piksel çözünürlük
-- Manuel damar segmentasyon maskeleri
+- Eğitim öncesinde **CLAHE** (Contrast Limited Adaptive Histogram Equalization) ile kontras artırma uygulanmıştır
 
-Görüntüler eğitim öncesinde **CLAHE** (Contrast Limited Adaptive Histogram Equalization) ile önişlemden geçirilmiştir.
+### Veri Bölünmesi
+
+| Set | Görüntü Sayısı | Maske Sayısı | Kullanım |
+|---|---|---|---|
+| **Eğitim (Train)** | ~370 | ~370 | Model ağırlıklarının öğrenilmesi |
+| **Doğrulama (Validation)** | ~100 | ~100 | Eğitim sırasında overfitting kontrolü |
+| **Test** | ~130 | ~130 | Nihai model performans değerlendirmesi |
+
+> ⚠️ Test görüntüleri eğitim sırasında modele **hiç gösterilmemiştir** — karşılaştırma sonuçları tamamen görülmemiş veri üzerindedir.
 
 ---
 
