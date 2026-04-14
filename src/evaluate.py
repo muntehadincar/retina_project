@@ -33,7 +33,7 @@ import matplotlib.pyplot as plt
 import matplotlib.patches as mpatches
 
 from train import DriveVesselDataset, get_id
-from model import UNet, AttentionUNet
+from model import UNet, AttentionUNet, ResUNet, SegFormerLite, SwinUNet
 
 # ---------------------------------------------------------------------------
 # Ayarlar
@@ -43,18 +43,39 @@ TEST_IMG_DIR  = os.path.join(BASE_DIR, "data", "test_im_png")
 TEST_MASK_DIR = os.path.join(BASE_DIR, "data", "test_mask_png")
 EVAL_DIR      = os.path.join(BASE_DIR, "results", "evaluation")
 IMG_SIZE      = 256
+IMG_SIZE_SWIN = 224   # Swin-Tiny pencere boyutu ile uyumlu
 THR           = 0.3   # sigmoid esik degeri (train.py ile ayni)
 
 MODELS = {
     "unet": {
-        "class": UNet,
-        "path":  os.path.join(BASE_DIR, "results", "models", "unet_best.pth"),
-        "color": "#4fc3f7",
+        "class":    UNet,
+        "path":     os.path.join(BASE_DIR, "results", "models", "unet_best.pth"),
+        "color":    "#4fc3f7",
+        "img_size": IMG_SIZE,
     },
     "attention_unet": {
-        "class": AttentionUNet,
-        "path":  os.path.join(BASE_DIR, "results", "models", "attention_unet_best.pth"),
-        "color": "#ff7043",
+        "class":    AttentionUNet,
+        "path":     os.path.join(BASE_DIR, "results", "models", "attention_unet_best.pth"),
+        "color":    "#ff7043",
+        "img_size": IMG_SIZE,
+    },
+    "resunet": {
+        "class":    ResUNet,
+        "path":     os.path.join(BASE_DIR, "results", "models", "resunet_best.pth"),
+        "color":    "#57B894",
+        "img_size": IMG_SIZE,
+    },
+    "segformer": {
+        "class":    SegFormerLite,
+        "path":     os.path.join(BASE_DIR, "results", "models", "segformer_best.pth"),
+        "color":    "#A066CC",
+        "img_size": IMG_SIZE,
+    },
+    "swinunet": {
+        "class":    SwinUNet,
+        "path":     os.path.join(BASE_DIR, "results", "models", "swinunet_best.pth"),
+        "color":    "#E8B84B",
+        "img_size": IMG_SIZE_SWIN,
     },
 }
 
@@ -99,7 +120,9 @@ def compute_metrics_numpy(pred_bin: np.ndarray, gt_bin: np.ndarray) -> dict:
 # ---------------------------------------------------------------------------
 def evaluate_model(model_name: str, model_cfg: dict, device: torch.device,
                    test_ids: list, ds) -> dict:
-    """Modeli yukleer, her test ornegi uzerinde tahminde bulunur ve metrikleri dondurur."""
+    """Modeli yukler, her test ornegi uzerinde tahminde bulunur ve metrikleri dondurur.
+    SwinUNet gibi farkli IMG_SIZE kullanan modeller icin ds parametresi otomatik guncellenir.
+    """
 
     model_path = model_cfg["path"]
 
@@ -111,6 +134,15 @@ def evaluate_model(model_name: str, model_cfg: dict, device: torch.device,
     model.load_state_dict(torch.load(model_path, map_location=device))
     model.eval()
     print(f"  Yuklendi: {model_path}")
+
+    # Modelin IMG_SIZE'i farkli ise yeni dataset olustur
+    model_img_size = model_cfg.get("img_size", IMG_SIZE)
+    if model_img_size != IMG_SIZE:
+        print(f"  Not: {model_name} icin IMG_SIZE={model_img_size} kullaniliyor.")
+        ds = DriveVesselDataset(
+            TEST_IMG_DIR, TEST_MASK_DIR,
+            ids=test_ids, augment=False, size=model_img_size
+        )
 
     per_image = []
     with torch.no_grad():
