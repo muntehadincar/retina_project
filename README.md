@@ -180,11 +180,9 @@ Bu veri setleri, retina damarlarının otomatik tespiti ve segmentasyonu üzerin
 
 | Set | Görüntü Sayısı | Maske Sayısı | Kullanım |
 |---|---|---|---|
-| **Eğitim (Train)** | ~370 | ~370 | Model ağırlıklarının öğrenilmesi |
+| **Eğitim (Train)** | ~380 | ~380 | Model ağırlıklarının öğrenilmesi |
 | **Doğrulama (Validation)** | ~100 | ~100 | Eğitim sırasında overfitting kontrolü |
-| **Test** | ~130 | ~130 | Nihai model performans değerlendirmesi |
-
-> ⚠️ Test görüntüleri eğitim sırasında modele **hiç gösterilmemiştir** — karşılaştırma sonuçları tamamen görülmemiş veri üzerindedir.
+| **Test** | ~120 | ~120 | Nihai model performans değerlendirmesi |
 
 ---
 
