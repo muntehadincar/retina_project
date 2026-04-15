@@ -3,8 +3,9 @@
 > **ResUNet** tabanlı, uçtan uca retinal damar segmentasyonu ve klinik özellik çıkarımı yapan web uygulaması.
 
 <p align="center">
-  <img src="assets/web_interface.png" alt="RetinAI Web Arayüzü" width="100%">
-  <img src="assets/web_interface1.png" alt="RetinAI Analiz Sonucu" width="100%">
+  <img src="assets/ui_home.png" alt="RetinAI Web Arayüzü" width="100%">
+  <img src="assets/ui_result.png" alt="RetinAI Analiz Sonucu" width="100%">
+  <img src="assets/ui_clinical.png" alt="RetinAI Klinik Bilgiler" width="100%">
 </p>
 
 ---
