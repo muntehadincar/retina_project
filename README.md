@@ -1,19 +1,21 @@
-# 🔬 RetinAI — Retinal Damar Segmentasyon Sistemi
+# 🔬 retinai — retinai Damar Segmentasyon Sistemi
 
-> **Attention U-Net** tabanlı, uçtan uca retinal damar segmentasyonu ve klinik özellik çıkarımı yapan web uygulaması.
+> **ResUNet** tabanlı, uçtan uca retinal damar segmentasyonu ve klinik özellik çıkarımı yapan web uygulaması.
 
-### 💻 Arayüzden Görüntüler
-![RetinAI Web Arayüzü - Başlangıç](assets/web_interface.png)
-![RetinAI Analiz Sonucu](assets/web_interface1.png)
+<p align="center">
+  <img src="assets/web_interface.png" alt="RetinAI Web Arayüzü" width="100%">
+  <img src="assets/web_interface1.png" alt="RetinAI Analiz Sonucu" width="100%">
+</p>
 
 ---
 
-
 ## 📌 Proje Hakkında
 
-Bu proje, göz fundus görüntülerindeki retinal damarları otomatik olarak segmente eden ve klinik özellikler çıkaran bir yapay zeka sistemidir. Kullanıcı bir fundus görüntüsü yüklediğinde sistem:
+Bu proje, göz fundus görüntülerindeki retinal damarları otomatik olarak segmente eden ve klinik özellikler çıkaran yapay zeka destekli bir web sistemidir.
 
-1. Görüntüyü **Attention U-Net** modeliyle işler
+Kullanıcı bir fundus görüntüsü yüklediğinde sistem:
+
+1. Görüntüyü **ResUNet** modeliyle işler
 2. Damar segmentasyon maskesini üretir
 3. **Damar piksel sayısı**, **alan oranı** ve **damar yoğunluğu** gibi klinik özellikleri hesaplar
 4. Sonuçları web arayüzünde görsel olarak sunar
@@ -24,37 +26,42 @@ Bu proje, göz fundus görüntülerindeki retinal damarları otomatik olarak seg
 
 ```
 retina_project/
-├── src/                          # Model eğitim ve değerlendirme kodları
-│   ├── model.py                  # UNet, AttentionUNet, ResUNet, SegFormerLite, SwinUNet
-│   ├── train.py                  # UNet eğitim döngüsü
-│   ├── train_attention_standalone.py  # Attention U-Net eğitimi (CSV loglu)
-│   ├── train_resunet.py          # ResUNet eğitimi
-│   ├── train_segformer.py        # SegFormer eğitimi
-│   ├── train_swinunet.py         # Swin-UNet eğitimi
-│   ├── train_compare.py          # UNet vs AttentionUNet karşılaştırmalı eğitim
-│   ├── evaluate.py               # Test seti değerlendirmesi (5 model, Dice, IoU vb.)
-│   ├── plot_multi_compare.py     # 5 model karşılaştırma grafikleri
-│   ├── clinical_features.py      # Klinik özellik çıkarımı ve CSV üretimi
-│   ├── visualize.py              # Tahmin görselleştirme
-│   ├── dataset.py                # Dataset sınıfı
-│   ├── utils.py                  # Loss fonksiyonları, metrikler, yardımcı araçlar
-│   └── split_test.py             # Test/train/val bölme scripti
+├── src/                               # Model eğitim ve değerlendirme kodları
+│   ├── model.py                       # UNet, AttentionUNet, ResUNet, SegFormerLite, SwinUNet
+│   ├── train.py                       # UNet eğitim döngüsü
+│   ├── train_attention.py             # Attention U-Net eğitimi
+│   ├── train_resunet.py               # ResUNet eğitimi
+│   ├── train_segformer.py             # SegFormer eğitimi
+│   ├── train_swinunet.py              # Swin-UNet eğitimi
+│   ├── train_compare.py               # UNet vs AttentionUNet karşılaştırmalı eğitim
+│   ├── evaluate.py                    # Test seti değerlendirmesi (5 model, Dice, IoU vb.)
+│   ├── plot_multi_compare.py          # 5 model karşılaştırma grafikleri
+│   ├── clinical_features.py           # Klinik özellik çıkarımı ve CSV üretimi
+│   ├── visualize.py                   # Tahmin görselleştirme
+│   ├── dataset.py                     # Dataset sınıfı
+│   ├── utils.py                       # Loss fonksiyonları, metrikler, yardımcı araçlar
+│   └── split_test.py                  # Test/train/val bölme scripti
 │
-├── retina_system/                # Web uygulaması (Full-Stack)
-│   ├── backend/                  # FastAPI sunucu
-│   │   ├── main.py               # Uygulama giriş noktası
-│   │   ├── routers/predict.py    # /api/predict endpointi
-│   │   ├── services/model_service.py  # Inference servisi
-│   │   └── core/config.py        # Konfigürasyon (model yolu, eşik vb.)
-│   ├── frontend/public/          # Statik web arayüzü
-│   │   ├── index.html            # Ana sayfa (RetinAI web UI)
-│   │   ├── style.css             # Glassmorphism tasarım sistemi
-│   │   └── script.js             # Görüntü yükleme ve analiz akışı
-│   ├── models/                   # Eğitilmiş model ağırlıkları (.pth)
-│   └── run.bat                   # Tek tıkla başlatma scripti (Windows)
+├── retina_system/                     # Web uygulaması (Full-Stack)
+│   ├── backend/                       # FastAPI sunucu
+│   │   ├── main.py                    # Uygulama giriş noktası
+│   │   ├── routers/predict.py         # /api/predict endpointi
+│   │   ├── services/model_service.py  # ResUNet inference servisi
+│   │   └── core/config.py             # Konfigürasyon (model yolu, eşik vb.)
+│   ├── frontend/public/               # Statik web arayüzü
+│   │   ├── index.html                 # Ana sayfa (RetinAI web UI)
+│   │   ├── style.css                  # Glassmorphism tasarım sistemi
+│   │   └── script.js                  # Görüntü yükleme ve analiz akışı
+│   ├── models/                        # Eğitilmiş model ağırlıkları (.pth)
+│   └── run.bat                        # Tek tıkla başlatma scripti (Windows)
 │
-├── data/                         # Veri seti (paylaşılmaz, .gitignore)
-└── results/                      # Değerlendirme sonuçları, CSV çıktıları
+├── data/                              # Veri seti (paylaşılmaz, .gitignore)
+├── results/                           # Değerlendirme sonuçları, CSV ve grafikler
+│   ├── logs/                          # Epoch bazlı eğitim logları (CSV)
+│   ├── evaluation/                    # Test seti metrik çıktıları (CSV)
+│   ├── plots/                         # Karşılaştırmalı grafik görselleri
+│   └── models/                        # Kayıtlı model ağırlıkları
+└── assets/                            # README görselleri
 ```
 
 ---
@@ -67,43 +74,116 @@ Projede **5 farklı segmentasyon mimarisi** karşılaştırmalı olarak eğitilm
 |---|---|---|---|
 | **UNet** | CNN | 31.0M | Klasik encoder-decoder mimarisi |
 | **Attention U-Net** | CNN | 34.9M | UNet + Attention Gate ile ince damar odağı |
-| **ResUNet** | CNN | 32.4M | Residual (artık) bağlantılı U-Net |
+| **ResUNet** ⭐ | CNN | 32.4M | Residual (artık) bağlantılı U-Net — **En Başarılı** |
 | **SegFormer Lite** | Transformer | 1.3M | MiT-inspired DWSConv + MLP decoder |
 | **Swin-UNet** | Transformer | 34.5M | Swin Transformer encoder + CNN decoder |
 
-### Attention U-Net
-Standart U-Net'e **Attention Gate** ekler. Decoder'daki her skip connection, encoder'dan gelen özellik haritasını dikkat mekanizmasıyla ağırlıklandırarak damar gibi ince yapılara odaklanmayı iyileştirir.
+### 🏆 ResUNet — Üretim Modeli
+
+ResUNet, standart U-Net'in encoder bloklarını **Residual Block** yapısıyla güçlendirir. Her blokta giriş ve çıkış arasında kısayol (shortcut) bağlantı eklenir; bu sayede gradyan akışı iyileşir ve derin ağlarda eğitim kararlılığı artar.
 
 ```
-Encoder (Down) → Bottleneck → Decoder (Up)
-                                  ↑
-                           AttentionGate
-                          (skip × alpha)
+[Giriş] ──► ResidualBlock ──► MaxPool ──► ... ──► Bottleneck
+                │                                       │
+                └────── skip connection ────────────────┘
+                                                        │
+                              ConvTranspose ◄──────────-┘
+                                    │
+                              ResidualBlock
+                                    │
+                                [Çıkış Maskesi]
 ```
 
-### Loss Fonksiyonu
-`BCEWithLogitsLoss` + `DiceLoss` kombinasyonu kullanılmıştır. Damar pikselleri az olduğundan sınıf dengesizliğini gidermek için `pos_weight=5.0` uygulanmıştır.
+**ResidualBlock yapısı:**
+```
+x ──► Conv3×3 ──► BN ──► ReLU ──► Conv3×3 ──► BN ──► (+) ──► ReLU
+│                                                       ▲
+└─────────────────── shortcut (Conv1×1 veya Identity) ──┘
+```
+
+---
+
+## 📊 Model Performans Karşılaştırması
+
+5 model, **119 test görüntüsü** üzerinde değerlendirilmiştir (sample 35–36 hariç: boş maske):
+
+| Model | Dice ↑ | IoU ↑ | Accuracy ↑ | Sensitivity ↑ | Specificity ↑ | Precision ↑ |
+|---|---|---|---|---|---|---|
+| **ResUNet** 🥇 | **0.7564** | **0.6243** | **0.9601** | 0.9133 | **0.9631** | **0.6631** |
+| Attention U-Net 🥈 | 0.7329 | 0.5882 | 0.9495 | **0.9198** | 0.9505 | 0.6202 |
+| UNet 🥉 | 0.7176 | 0.5704 | 0.9506 | 0.8378 | 0.9588 | 0.6440 |
+| SwinUNet | 0.6458 | 0.4842 | 0.9278 | 0.8605 | 0.9319 | 0.5266 |
+| SegFormer Lite | 0.5259 | 0.3645 | 0.9040 | 0.7539 | 0.9146 | 0.4194 |
+
+> **Dice skoru**, segmentasyonda tahmin edilen ve gerçek mask piksellerinin örtüşme oranını ölçer. En kritik başarım metriğidir.
+
+**Sonuç:** ResUNet, residual bağlantılar sayesinde ince damar yapılarını yakalamada CNN tabanlı modeller arasında en yüksek başarımı göstermiştir. Transformer tabanlı modeller (SwinUNet, SegFormer) sınırlı veri setinde CNN modellerinin gerisinde kalmıştır.
+
+---
+
+## ⚙️ Loss Fonksiyonu ve Eğitim
+
+```python
+Loss = BCEWithLogitsLoss(pos_weight=5.0) + DiceLoss
+```
+
+- **BCEWithLogitsLoss** — Piksel bazlı ikili sınıflandırma
+- **DiceLoss** — Segmentasyon örtüşme odaklı düzeltici
+- **pos_weight=5.0** — Damar piksellerinin azlığından kaynaklanan sınıf dengesizliğini giderir
 
 ### Değerlendirme Metrikleri
+
 | Metrik | Açıklama |
 |---|---|
-| **Dice** | Ana segmentasyon başarım ölçütü |
-| **IoU** | Kesişim / Birleşim oranı |
-| **Precision / Recall** | Kesinlik ve duyarlılık |
-| **Sensitivity / Specificity** | Klinik doğruluk metrikleri |
+| **Dice** | 2×TP / (2×TP + FP + FN) — Ana başarım ölçütü |
+| **IoU** | TP / (TP + FP + FN) — Kesişim / Birleşim oranı |
+| **Precision** | TP / (TP + FP) — Kesinlik |
+| **Sensitivity (Recall)** | TP / (TP + FN) — Duyarlılık |
+| **Specificity** | TN / (TN + FP) — Özgüllük |
+| **Accuracy** | (TP + TN) / Toplam piksel sayısı |
+
+---
+
+## 📂 Veri Seti
+
+Bu çalışmada kullanılan retina görüntüleri, 4–83 yaş aralığındaki bireyleri kapsayan açık erişimli veri setlerinden elde edilmiştir:
+
+| Veri Seti | Kaynak |
+|---|---|
+| **DRIVE** | Digital Retinal Images for Vessel Extraction |
+| **STARE** | Structured Analysis of the Retina |
+| **CHASEDB1** | Child Heart and Health Study in England Database |
+| **FIVES** | Fundus Image Vessel Segmentation |
+
+### Görüntü Özellikleri
+
+- **600 renkli retina fundus görüntüsü** + **600 manuel damar segmentasyon maskesi**
+- 565×584 piksel çözünürlük
+- Eğitim öncesinde **CLAHE** (Contrast Limited Adaptive Histogram Equalization) ile kontrast artırma uygulanmıştır
+
+### Veri Bölünmesi
+
+| Set | Görüntü Sayısı | Kullanım |
+|---|---|---|
+| **Eğitim (Train)** | ~380 | Model ağırlıklarının öğrenilmesi |
+| **Doğrulama (Validation)** | ~100 | Overfitting kontrolü |
+| **Test** | ~120 | Nihai performans değerlendirmesi |
 
 ---
 
 ## 🚀 Kurulum ve Çalıştırma
 
 ### Gereksinimler
+
 ```bash
 pip install -r requirements.txt
 ```
 
 Ana bağımlılıklar: `torch`, `torchvision`, `fastapi`, `uvicorn`, `opencv-python`, `Pillow`, `numpy`
 
-### Web Uygulamasını Başlatma (Windows)
+---
+
+### 🖥️ Web Uygulamasını Başlatma (Windows)
 
 ```bash
 cd retina_system
@@ -114,28 +194,38 @@ veya manuel olarak:
 
 ```bash
 cd retina_system/backend
-uvicorn main:app --reload --port 8000
+python -m uvicorn main:app --reload --port 8000
 ```
 
 Tarayıcıda aç: [http://localhost:8000](http://localhost:8000)
 
-> ⚠️ Çalıştırmadan önce `retina_system/models/` klasörüne eğitilmiş model ağırlığını (`attention_unet_best.pth`) yerleştirin.
+> ⚠️ Çalıştırmadan önce `retina_system/models/` klasörüne eğitilmiş model ağırlığını (`resunet_best.pth`) yerleştirin.
 
-### Model Eğitimi
+---
+
+### 🧠 Model Eğitimi
 
 ```bash
+# ResUNet eğitimi
+python src/train_resunet.py
+
 # Attention U-Net eğitimi
 python src/train_attention.py
 
-# Her iki modeli karşılaştırmalı eğitme
-python src/train_compare.py
+# Tüm modelleri karşılaştırmalı değerlendirme
+python src/evaluate.py
 ```
 
-### Değerlendirme ve Klinik Özellik Çıkarımı
+---
+
+### 📈 Değerlendirme ve Görselleştirme
 
 ```bash
 # Test seti değerlendirmesi
 python src/evaluate.py
+
+# Karşılaştırmalı grafik üretimi
+python src/plot_multi_compare.py
 
 # Klinik özellik CSV üretimi
 $env:PYTHONUTF8=1; python src/clinical_features.py
@@ -145,11 +235,14 @@ $env:PYTHONUTF8=1; python src/clinical_features.py
 
 ## 🌐 API Kullanımı
 
-`POST /api/predict` — Görüntü yükle, segmentasyon al
+### `POST /api/predict`
 
+Görüntü yükle, segmentasyon maskesi ve klinik özellikler al.
+
+**İstek:** `multipart/form-data` — `file` alanı (PNG/JPEG)
+
+**Yanıt:**
 ```json
-// İstek: multipart/form-data — "file" alanı
-// Yanıt:
 {
   "mask_base64": "<base64 PNG>",
   "vessel_pixel_count": 4821,
@@ -184,6 +277,13 @@ Bu veri setleri, retina damarlarının otomatik tespiti ve segmentasyonu üzerin
 | **Doğrulama (Validation)** | ~100 | ~100 | Eğitim sırasında overfitting kontrolü |
 | **Test** | ~120 | ~120 | Nihai model performans değerlendirmesi |
 
+**Örnek cURL:**
+```bash
+curl -X POST http://localhost:8000/api/predict \
+  -F "file=@retina_image.png"
+```
+
+Swagger dokümantasyonu: [http://localhost:8000/docs](http://localhost:8000/docs)
 ---
 
 ## 🛠️ Teknoloji Yığını
@@ -200,5 +300,5 @@ Bu veri setleri, retina damarlarının otomatik tespiti ve segmentasyonu üzerin
 
 ## 👩‍💻 Geliştirici
 
-**Münteha Dincar**
+**Münteha Dincar**  
 retinai Fundus Görüntülerinde Damar Segmentasyonu — Tıp Mühendisliği Bitirme Projesi 2026
