@@ -109,7 +109,7 @@ analyzeBtn.addEventListener('click', async () => {
         showError(err.message);
     } finally {
         analyzeBtn.disabled = false;
-        document.querySelector('.btn-text').textContent = "Analiz Et (Attention U-Net)";
+        document.querySelector('.btn-text').textContent = "Analiz Et (ResUNet)";
         document.querySelector('.spinner').hidden = true;
     }
 });

@@ -19,7 +19,7 @@ async def lifespan(app: FastAPI):
 
 app = FastAPI(
     title="Retina Vessel Segmentation API",
-    description="Attention U-Net ile retinal damar segmentasyonu",
+    description="ResUNet ile retinal damar segmentasyonu",
     version="1.0.0",
     lifespan=lifespan,
 )
