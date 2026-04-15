@@ -1,4 +1,4 @@
-# 🔬 retinai — retinai Damar Segmentasyon Sistemi
+# 🔬 retinai — Damar Segmentasyon Sistemi
 
 > **ResUNet** tabanlı, uçtan uca retinal damar segmentasyonu ve klinik özellik çıkarımı yapan web uygulaması.
 
@@ -105,7 +105,7 @@ x ──► Conv3×3 ──► BN ──► ReLU ──► Conv3×3 ──► BN
 
 ## 📊 Model Performans Karşılaştırması
 
-5 model, **119 test görüntüsü** üzerinde değerlendirilmiştir (sample 35–36 hariç: boş maske):
+5 model, **119 test görüntüsü** üzerinde değerlendirilmiştir:
 
 | Model | Dice ↑ | IoU ↑ | Accuracy ↑ | Sensitivity ↑ | Specificity ↑ | Precision ↑ |
 |---|---|---|---|---|---|---|
@@ -209,9 +209,6 @@ Tarayıcıda aç: [http://localhost:8000](http://localhost:8000)
 # ResUNet eğitimi
 python src/train_resunet.py
 
-# Attention U-Net eğitimi
-python src/train_attention.py
-
 # Tüm modelleri karşılaştırmalı değerlendirme
 python src/evaluate.py
 ```
@@ -250,6 +247,14 @@ Görüntü yükle, segmentasyon maskesi ve klinik özellikler al.
   "vessel_density": 0.0736
 }
 ```
+**Örnek cURL:**
+```bash
+curl -X POST http://localhost:8000/api/predict \
+  -F "file=@retina_image.png"
+```
+
+Swagger dokümantasyonu: [http://localhost:8000/docs](http://localhost:8000/docs)
+---
 
 ---
 
@@ -277,14 +282,6 @@ Bu veri setleri, retina damarlarının otomatik tespiti ve segmentasyonu üzerin
 | **Doğrulama (Validation)** | ~100 | ~100 | Eğitim sırasında overfitting kontrolü |
 | **Test** | ~120 | ~120 | Nihai model performans değerlendirmesi |
 
-**Örnek cURL:**
-```bash
-curl -X POST http://localhost:8000/api/predict \
-  -F "file=@retina_image.png"
-```
-
-Swagger dokümantasyonu: [http://localhost:8000/docs](http://localhost:8000/docs)
----
 
 ## 🛠️ Teknoloji Yığını
 
