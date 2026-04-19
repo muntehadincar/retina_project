@@ -1,4 +1,4 @@
-# -*- coding: utf-8 -*-
+
 """
 evaluate.py
 ===========
@@ -19,7 +19,7 @@ Ciktilar:
   results/evaluation/evaluation_comparison.png  <- model karsilastirma grafigi
 
 Kullanim:
-  $env:PYTHONUTF8=1; python src/evaluate.py
+   python src/evaluate.py
 """
 
 import os
@@ -35,9 +35,7 @@ import matplotlib.patches as mpatches
 from train import DriveVesselDataset, get_id
 from model import UNet, AttentionUNet, ResUNet, SegFormerLite, SwinUNet
 
-# ---------------------------------------------------------------------------
-# Ayarlar
-# ---------------------------------------------------------------------------
+
 BASE_DIR      = os.path.dirname(os.path.dirname(__file__))
 TEST_IMG_DIR  = os.path.join(BASE_DIR, "data", "test_im_png")
 TEST_MASK_DIR = os.path.join(BASE_DIR, "data", "test_mask_png")
@@ -80,9 +78,7 @@ MODELS = {
 }
 
 
-# ---------------------------------------------------------------------------
-# Yardimci: metrik hesapla (tek goruntu, numpy uzerinde)
-# ---------------------------------------------------------------------------
+
 EPS = 1e-7
 
 def compute_metrics_numpy(pred_bin: np.ndarray, gt_bin: np.ndarray) -> dict:
@@ -115,9 +111,9 @@ def compute_metrics_numpy(pred_bin: np.ndarray, gt_bin: np.ndarray) -> dict:
     }
 
 
-# ---------------------------------------------------------------------------
+
 # Tek modeli degerlendir
-# ---------------------------------------------------------------------------
+
 def evaluate_model(model_name: str, model_cfg: dict, device: torch.device,
                    test_ids: list, ds) -> dict:
     """Modeli yukler, her test ornegi uzerinde tahminde bulunur ve metrikleri dondurur.
@@ -160,9 +156,9 @@ def evaluate_model(model_name: str, model_cfg: dict, device: torch.device,
     return per_image
 
 
-# ---------------------------------------------------------------------------
+ 
 # Ozet tablosu yazdir ve kaydet
-# ---------------------------------------------------------------------------
+
 METRIC_KEYS = ["dice", "iou", "accuracy", "sensitivity", "specificity", "precision"]
 METRIC_LABELS = {
     "dice":        "Dice Score",
@@ -224,9 +220,9 @@ def save_summary_txt(all_summaries: dict, path: str, n_samples: int):
     print(f"  Ozet kaydedildi: {path}")
 
 
-# ---------------------------------------------------------------------------
+
 # Karsilastirma grafigi
-# ---------------------------------------------------------------------------
+
 def plot_comparison(all_summaries: dict, out_dir: str):
     if len(all_summaries) < 1:
         return
@@ -289,9 +285,7 @@ def plot_comparison(all_summaries: dict, out_dir: str):
     print(f"  Grafik kaydedildi: {out_path}")
 
 
-# ---------------------------------------------------------------------------
-# Ana Akis
-# ---------------------------------------------------------------------------
+
 def main():
     print("=" * 60)
     print("  EVALUATE.PY  --  Test Set Degerlendirmesi")

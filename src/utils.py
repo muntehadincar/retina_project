@@ -3,9 +3,8 @@ import torch.nn as nn
 import os
 
 
-# ---------------------------------------------------------------------------
+
 # Loss Functions
-# ---------------------------------------------------------------------------
 
 class DiceLoss(nn.Module):
     """Differansiyellenebilir Dice kayıp fonksiyonu (binary segmentasyon için)."""
@@ -41,9 +40,9 @@ class CombinedLoss(nn.Module):
         return self.alpha * bce_val + (1.0 - self.alpha) * dice_val
 
 
-# ---------------------------------------------------------------------------
+
 # Metrics
-# ---------------------------------------------------------------------------
+
 
 def compute_metrics(logits: torch.Tensor,
                     target: torch.Tensor,
@@ -86,9 +85,9 @@ def compute_metrics(logits: torch.Tensor,
     }
 
 
-# ---------------------------------------------------------------------------
-# Eski arayüz — geriye dönük uyumluluk
-# ---------------------------------------------------------------------------
+
+# Eski arayüz 
+
 
 def dice_score(logits: torch.Tensor,
                target: torch.Tensor,
@@ -98,9 +97,9 @@ def dice_score(logits: torch.Tensor,
     return compute_metrics(logits, target, thr=thr, eps=eps)["dice"]
 
 
-# ---------------------------------------------------------------------------
+
 # Yardımcı fonksiyonlar
-# ---------------------------------------------------------------------------
+
 
 def save_checkpoint(state_dict, path: str):
     os.makedirs(os.path.dirname(path), exist_ok=True)

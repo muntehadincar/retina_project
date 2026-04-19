@@ -58,9 +58,9 @@ class UNet(nn.Module):
         return self.final(x)
 
 
-# ---------------------------------------------------------------------------
+
 # Attention Gate
-# ---------------------------------------------------------------------------
+
 
 # Attention Gate: decoder'dan gelen g sinyali ile encoder skip feature'ı x'i karşılaştırıp
 # her piksel için 0-1 arası bir ağırlık (alpha) üretir, sonra x * alpha döner.
@@ -93,9 +93,9 @@ class AttentionGate(nn.Module):
         return x * alpha               # ağırlıklı skip feature
 
 
-# ---------------------------------------------------------------------------
+
 # Attention U-Net
-# ---------------------------------------------------------------------------
+
 
 # Attention U-Net: standart U-Net'ten farkı decoder kısmında
 # skip connection'lar doğrudan gelmez, önce AttentionGate'ten geçer.
@@ -157,9 +157,9 @@ class AttentionUNet(nn.Module):
         return self.final(x)
 
 
-# ─────────────────────────────────────────────────────────────────────────────
+
 # ResUNet
-# ─────────────────────────────────────────────────────────────────────────────
+
 
 class ResidualBlock(nn.Module):
     """Artık bağlantılı çift konvolüsyon bloğu (in_ch ≠ out_ch olsa bile shortcut)."""
@@ -235,9 +235,9 @@ class ResUNet(nn.Module):
         return self.final(x)
 
 
-# ─────────────────────────────────────────────────────────────────────────────
+
 # SegFormer-Lite   (gereksinim: pip install timm>=0.9)
-# ─────────────────────────────────────────────────────────────────────────────
+
 
 class _DWSConv(nn.Module):
     """Depthwise Separable Conv + BN + ReLU."""
@@ -343,10 +343,10 @@ class SegFormerLite(nn.Module):
         return x
 
 
-# ─────────────────────────────────────────────────────────────────────────────
+
 # Swin-UNet   (gereksinim: pip install timm>=0.9)
 # Girdi boyutu: 224×224 (Swin-Tiny pencere boyutu 7 ile tam uyumlu)
-# ─────────────────────────────────────────────────────────────────────────────
+
 
 class SwinUNet(nn.Module):
     """

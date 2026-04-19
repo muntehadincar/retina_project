@@ -1,4 +1,4 @@
-# -*- coding: utf-8 -*-
+
 """
 visualize.py
 ============
@@ -14,7 +14,7 @@ visualize.py
   results/preds/comparison/strip_all.png    ← tüm örnekler tek şerit
 
 Kullanım:
-    $env:PYTHONUTF8=1; python src/visualize.py
+     python src/visualize.py
 """
 
 import os
@@ -29,9 +29,9 @@ import matplotlib.gridspec as gridspec
 from train import DriveVesselDataset, get_id
 from model import UNet, AttentionUNet
 
-# ---------------------------------------------------------------------------
+
 # Ayarlar
-# ---------------------------------------------------------------------------
+
 BASE_DIR = os.path.dirname(os.path.dirname(__file__))
 
 MODEL_PATHS = {
@@ -55,9 +55,9 @@ PLOT_DIR = os.path.join(BASE_DIR, "results", "plots")
 CMP_DIR  = os.path.join(BASE_DIR, "results", "preds", "comparison")
 
 
-# ---------------------------------------------------------------------------
+
 # Bölüm 1 — Eğitim eğrileri
-# ---------------------------------------------------------------------------
+
 def plot_training_curves(history_csv, model_name, out_dir):
     if not os.path.exists(history_csv):
         print(f"[UYARI] Eğitim geçmişi bulunamadı: {history_csv} — atlanıyor.")
@@ -137,9 +137,9 @@ def plot_training_curves(history_csv, model_name, out_dir):
     print(f"[PLOT] Eğitim eğrileri → {out_path}")
 
 
-# ---------------------------------------------------------------------------
+
 # Yardımcı: model yükle
-# ---------------------------------------------------------------------------
+
 def load_model(name, device):
     path = MODEL_PATHS[name]
     if not os.path.exists(path):
@@ -152,10 +152,10 @@ def load_model(name, device):
     return m
 
 
-# ---------------------------------------------------------------------------
+
 # Bölüm 2 — 4 sütunlu karşılaştırma görseli
 #   Sütunlar: Orijinal | Ground Truth | UNet Pred | AttUNet Pred
-# ---------------------------------------------------------------------------
+
 def visualize_comparison(unet, att_unet, device, out_dir, max_samples=MAX_SAMPLES):
     if not os.path.isdir(TEST_IMG_DIR) or not os.listdir(TEST_IMG_DIR):
         print(f"[UYARI] Test klasörü boş: {TEST_IMG_DIR}")
@@ -236,7 +236,7 @@ def visualize_comparison(unet, att_unet, device, out_dir, max_samples=MAX_SAMPLE
             plt.close(fig)
             print(f"  Kaydedildi: {out_path}")
 
-    # ── Toplu şerit ──────────────────────────────────────────────────────────
+    #  Toplu şerit 
     print("\n[CMP] Toplu şerit oluşturuluyor...")
     rows = 4   # Orijinal / GT / UNet / AttUNet
     fig, axes = plt.subplots(rows, n,
@@ -269,9 +269,9 @@ def visualize_comparison(unet, att_unet, device, out_dir, max_samples=MAX_SAMPLE
     print(f"[CMP] Toplu şerit → {strip_path}")
 
 
-# ---------------------------------------------------------------------------
+
 # Ana akış
-# ---------------------------------------------------------------------------
+
 def main():
     print("=" * 65)
     print("  VISUALIZE.PY  —  4-Sütun Model Karşılaştırması")
@@ -280,12 +280,12 @@ def main():
     device = torch.device("cuda" if torch.cuda.is_available() else "cpu")
     print(f"Device: {device}\n")
 
-    # ── 1. Eğitim eğrileri ──────────────────────────────────────────────────
+    #  1. Eğitim eğrileri 
     print("--- Bölüm 1: Eğitim Eğrileri ---")
     for name in ("unet", "attention_unet"):
         plot_training_curves(HISTORY_PATHS[name], name, PLOT_DIR)
 
-    # ── 2. Model yükle ──────────────────────────────────────────────────────
+    # 2. Model yükle 
     print("\n--- Bölüm 2: Modeller Yükleniyor ---")
     try:
         unet     = load_model("unet",           device)
@@ -295,7 +295,7 @@ def main():
         print("  → Önce train_compare.py ile her iki modeli eğitin.")
         return
 
-    # ── 3. 4 sütunlu karşılaştırma görseli ──────────────────────────────────
+    #  3. 4 sütunlu karşılaştırma görseli 
     print("\n--- Bölüm 3: 4-Sütun Karşılaştırma Görseli ---")
     visualize_comparison(unet, att_unet, device, out_dir=CMP_DIR,
                          max_samples=MAX_SAMPLES)

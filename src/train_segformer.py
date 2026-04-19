@@ -1,6 +1,6 @@
 """
 train_segformer.py
-------------------
+
 SegFormer-Lite (MiT-B0 encoder) modelini 30 epoch boyunca eğitir.
 
 GEREKSİNİM: pip install timm>=0.9
@@ -16,7 +16,7 @@ import random
 import csv
 import sys
 
-# timm kurulu mu? Erken kontrol
+# timm kurulu mu?
 try:
     import timm  # noqa: F401
 except ImportError:
@@ -33,16 +33,16 @@ from model import SegFormerLite
 from utils import CombinedLoss, compute_metrics
 from train import DriveVesselDataset, IMG_DIR, MASK_DIR, TEST_IDS_FILE, get_id
 
-# ─── Ayarlar ────────────────────────────────────────────────────────────────
+
 EPOCHS     = 30
 BATCH_SIZE = 2
 LR         = 1e-4
 POS_WEIGHT = 5.0
 SEED       = 42
-IMG_SIZE   = 256        # SegFormer 256×256 ile sorunsuz çalışır
+IMG_SIZE   = 256        # SegFormer 256×256 ile müko çalışır
 MODEL_NAME = "segformer"
 
-# ─── Dizinler ───────────────────────────────────────────────────────────────
+
 BASE_DIR = os.path.dirname(os.path.dirname(__file__))
 OUT_DIR  = os.path.join(BASE_DIR, "results", "models")
 LOG_DIR  = os.path.join(BASE_DIR, "results", "logs")
@@ -57,7 +57,7 @@ CSV_FIELDS  = (["epoch", "train_loss", "train_dice", "val_loss", "val_dice"] +
                [f"val_{k}"   for k in METRIC_KEYS if k != "dice"])
 
 
-# ─── Tek Epoch ──────────────────────────────────────────────────────────────
+
 def run_epoch(model, loader, loss_fn, optimizer, device, train=True):
     model.train() if train else model.eval()
     total_loss = 0.0
@@ -83,7 +83,7 @@ def run_epoch(model, loader, loss_fn, optimizer, device, train=True):
     return total_loss / n, {k: v / n for k, v in sum_m.items()}
 
 
-# ─── Ana Fonksiyon ──────────────────────────────────────────────────────────
+
 def main():
     random.seed(SEED)
     torch.manual_seed(SEED)

@@ -4,14 +4,6 @@ train_compare.py
 UNet ve AttentionUNet'i ayni veri bolumu, kayip fonksiyonu ve
 augmentation ayarlari altinda ard ardina egitir.
 
-Her epoch sonunda iki modelin metriklerini yan yana yazar:
-
-  Epoch 01  |  loss: UNet train=0.42  val=0.50   |  AttUNet train=0.40  val=0.48
-    Metric         UNet-Tr  UNet-Val  Att-Tr   Att-Val
-    ─────────────────────────────────────────────────
-    dice           0.7234   0.6891   0.7412   0.7100
-    ...
-
 Kaydedilen modeller:
   results/models/unet_best.pth
   results/models/attention_unet_best.pth
@@ -27,9 +19,7 @@ from model import UNet, AttentionUNet
 from utils import CombinedLoss, compute_metrics
 from train import DriveVesselDataset, IMG_DIR, MASK_DIR, TEST_IDS_FILE, get_id
 
-# ---------------------------------------------------------------------------
-# Ayarlar
-# ---------------------------------------------------------------------------
+
 EPOCHS     = 30
 BATCH_SIZE = 2
 LR         = 1e-4
@@ -44,9 +34,7 @@ METRIC_KEYS = ["dice", "iou", "precision", "recall",
                "accuracy", "sensitivity", "specificity"]
 
 
-# ---------------------------------------------------------------------------
-# Yardimci: tek epoch
-# ---------------------------------------------------------------------------
+
 def run_epoch(model, loader, loss_fn, optimizer, device, train=True):
     model.train() if train else model.eval()
 
@@ -73,9 +61,7 @@ def run_epoch(model, loader, loss_fn, optimizer, device, train=True):
     return total_loss / n, {k: v / n for k, v in sum_m.items()}
 
 
-# ---------------------------------------------------------------------------
-# Ana fonksiyon
-# ---------------------------------------------------------------------------
+
 def main():
     random.seed(SEED)
     torch.manual_seed(SEED)

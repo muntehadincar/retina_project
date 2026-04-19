@@ -24,7 +24,7 @@ import matplotlib.pyplot as plt
 import matplotlib.ticker as mticker
 import numpy as np
 
-# ─── Ayarlar ────────────────────────────────────────────────────────────────
+
 BASE_DIR  = os.path.dirname(os.path.dirname(__file__))
 LOG_DIR   = os.path.join(BASE_DIR, "results", "logs")
 PLOT_DIR  = os.path.join(BASE_DIR, "results", "plots")
@@ -59,7 +59,7 @@ METRIC_LABELS = {
 }
 
 
-# ─── CSV okuma ──────────────────────────────────────────────────────────────
+
 def load_history(path: str) -> list[dict]:
     """CSV'yi satır listesi olarak döndürür (float değerli)."""
     rows = []
@@ -75,7 +75,7 @@ def best_row(rows: list[dict]) -> dict:
     return max(rows, key=lambda r: r["val_dice"])
 
 
-# ─── Grafik 1: Val Dice Eğrileri ────────────────────────────────────────────
+#Grafik 1: Val Dice Eğrileri
 def plot_val_dice_curves(histories: dict[str, list[dict]]):
     fig, ax = plt.subplots(figsize=(10, 6))
     fig.patch.set_facecolor("#1A1A2E")
@@ -107,7 +107,7 @@ def plot_val_dice_curves(histories: dict[str, list[dict]]):
     print(f"  ✅ {out}")
 
 
-# ─── Grafik 2: En İyi Val Dice Bar Grafiği ──────────────────────────────────
+# Grafik 2: En İyi Val Dice Bar Grafiği
 def plot_best_dice_bar(histories: dict[str, list[dict]]):
     names  = list(histories.keys())
     scores = [best_row(histories[n])["val_dice"] for n in names]
@@ -147,7 +147,7 @@ def plot_best_dice_bar(histories: dict[str, list[dict]]):
     print(f"  ✅ {out}")
 
 
-# ─── Grafik 3: Tüm Metrikler Yan Yana ──────────────────────────────────────
+# Grafik 3: Tüm Metrikler Yan Yana
 def plot_all_metrics_bar(histories: dict[str, list[dict]]):
     """
     Her model için en iyi val_dice epoch'undaki val metriklerini gösterir.
@@ -206,7 +206,7 @@ def plot_all_metrics_bar(histories: dict[str, list[dict]]):
     print(f"  ✅ {out}")
 
 
-# ─── Ana Fonksiyon ──────────────────────────────────────────────────────────
+# 
 def main():
     print(f"\n{'='*60}")
     print("  plot_multi_compare.py — Model Karşılaştırma Grafikleri")

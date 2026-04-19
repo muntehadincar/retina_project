@@ -1,6 +1,6 @@
 """
 train_swinunet.py
------------------
+
 Swin-UNet (Swin-Tiny encoder + CNN decoder) modelini 30 epoch boyunca eğitir.
 
 ÖNEMLİ:
@@ -18,7 +18,7 @@ import random
 import csv
 import sys
 
-# timm kurulu mu? Erken kontrol
+# timm kurulu mu? 
 try:
     import timm  # noqa: F401
 except ImportError:
@@ -35,7 +35,7 @@ from model import SwinUNet
 from utils import CombinedLoss, compute_metrics
 from train import DriveVesselDataset, IMG_DIR, MASK_DIR, TEST_IDS_FILE, get_id
 
-# ─── Ayarlar ────────────────────────────────────────────────────────────────
+
 EPOCHS     = 30
 BATCH_SIZE = 2
 LR         = 1e-4
@@ -44,7 +44,7 @@ SEED       = 42
 IMG_SIZE   = 224        # Swin-Tiny için pencere uyumlu boyut (7×7 window)
 MODEL_NAME = "swinunet"
 
-# ─── Dizinler ───────────────────────────────────────────────────────────────
+
 BASE_DIR = os.path.dirname(os.path.dirname(__file__))
 OUT_DIR  = os.path.join(BASE_DIR, "results", "models")
 LOG_DIR  = os.path.join(BASE_DIR, "results", "logs")
@@ -59,7 +59,7 @@ CSV_FIELDS  = (["epoch", "train_loss", "train_dice", "val_loss", "val_dice"] +
                [f"val_{k}"   for k in METRIC_KEYS if k != "dice"])
 
 
-# ─── Tek Epoch ──────────────────────────────────────────────────────────────
+
 def run_epoch(model, loader, loss_fn, optimizer, device, train=True):
     model.train() if train else model.eval()
     total_loss = 0.0
@@ -85,7 +85,7 @@ def run_epoch(model, loader, loss_fn, optimizer, device, train=True):
     return total_loss / n, {k: v / n for k, v in sum_m.items()}
 
 
-# ─── Ana Fonksiyon ──────────────────────────────────────────────────────────
+
 def main():
     random.seed(SEED)
     torch.manual_seed(SEED)

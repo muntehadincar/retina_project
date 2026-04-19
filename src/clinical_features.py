@@ -1,6 +1,5 @@
-# -*- coding: utf-8 -*-
+
 # Her test görüntüsü için damar özelliklerini hesaplar (piksel sayısı, alan oranı, yoğunluk).
-# UNet ve AttentionUNet için ayrı CSV dosyaları üretir, ayrıca karşılaştırma CSV'si kaydeder.
 
 import os
 import csv
@@ -10,9 +9,7 @@ import torch
 from train import DriveVesselDataset, get_id
 from model import UNet, AttentionUNet
 
-# ---------------------------------------------------------------------------
-# Ayarlar
-# ---------------------------------------------------------------------------
+
 BASE_DIR      = os.path.dirname(os.path.dirname(__file__))
 TEST_IMG_DIR  = os.path.join(BASE_DIR, "data", "test_im_png")
 TEST_MASK_DIR = os.path.join(BASE_DIR, "data", "test_mask_png")
@@ -36,9 +33,7 @@ MODELS = {
 FIELDS = ["image_name", "vessel_pixel_count", "vessel_area_ratio", "vessel_density"]
 
 
-# ---------------------------------------------------------------------------
-# Yardımcı
-# ---------------------------------------------------------------------------
+
 def load_model(cfg, device):
     path = cfg["path"]
     if not os.path.exists(path):
@@ -93,9 +88,7 @@ def print_table(model_name, rows):
               f"{r['vessel_area_ratio']:>17.4f}  {r['vessel_density']:>14.4f}")
 
 
-# ---------------------------------------------------------------------------
-# Ana akış
-# ---------------------------------------------------------------------------
+
 def main():
     print("=" * 60)
     print("  CLINICAL_FEATURES.PY  —  Klinik Özellik Çıkarma")
