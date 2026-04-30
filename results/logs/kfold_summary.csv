@@ -1,0 +1,4 @@
+model,mean_dice,std_dice,fold1_dice,fold2_dice,fold3_dice,fold4_dice,fold5_dice
+unet,0.7602,0.0111,0.7812,0.7545,0.7614,0.7518,0.7519
+attention_unet,0.7641,0.0159,0.795,0.7567,0.7631,0.7541,0.7518
+unet,0.7602,0.0111,0.7812,0.7545,0.7614,0.7518,0.7519
