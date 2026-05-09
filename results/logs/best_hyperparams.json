@@ -1,0 +1,132 @@
+{
+  "unet": {
+    "lr": 0.001,
+    "batch_size": 4,
+    "pos_weight": 3.0,
+    "best_dice_search": 0.6148,
+    "search_config": {
+      "lr_list": [
+        0.001,
+        0.0005,
+        0.0001
+      ],
+      "batch_size_list": [
+        2,
+        4
+      ],
+      "pos_weight_list": [
+        3.0,
+        5.0,
+        7.0
+      ],
+      "search_epochs": 10,
+      "search_img_size": 128,
+      "total_combinations": 18,
+      "seed": 42
+    }
+  },
+  "attention_unet": {
+    "lr": 0.001,
+    "batch_size": 2,
+    "pos_weight": 3.0,
+    "best_dice_search": 0.6137,
+    "search_config": {
+      "lr_list": [
+        0.001,
+        0.0005,
+        0.0001
+      ],
+      "batch_size_list": [
+        2,
+        4
+      ],
+      "pos_weight_list": [
+        3.0,
+        5.0,
+        7.0
+      ],
+      "search_epochs": 10,
+      "search_img_size": 128,
+      "total_combinations": 18,
+      "seed": 42
+    }
+  },
+  "resunet": {
+    "lr": 0.0005,
+    "batch_size": 4,
+    "pos_weight": 3.0,
+    "best_dice_search": 0.6039,
+    "search_config": {
+      "lr_list": [
+        0.001,
+        0.0005,
+        0.0001
+      ],
+      "batch_size_list": [
+        2,
+        4
+      ],
+      "pos_weight_list": [
+        3.0,
+        5.0,
+        7.0
+      ],
+      "search_epochs": 10,
+      "search_img_size": 128,
+      "total_combinations": 18,
+      "seed": 42
+    }
+  },
+  "segformer": {
+    "lr": 0.001,
+    "batch_size": 2,
+    "pos_weight": 3.0,
+    "best_dice_search": 0.3684,
+    "search_config": {
+      "lr_list": [
+        0.001,
+        0.0005,
+        0.0001
+      ],
+      "batch_size_list": [
+        2,
+        4
+      ],
+      "pos_weight_list": [
+        3.0,
+        5.0,
+        7.0
+      ],
+      "search_epochs": 10,
+      "search_img_size": 128,
+      "total_combinations": 18,
+      "seed": 42
+    }
+  },
+  "swinunet": {
+    "lr": 0.001,
+    "batch_size": 2,
+    "pos_weight": 3.0,
+    "best_dice_search": 0.6426,
+    "search_config": {
+      "lr_list": [
+        0.001,
+        0.0005,
+        0.0001
+      ],
+      "batch_size_list": [
+        2,
+        4
+      ],
+      "pos_weight_list": [
+        3.0,
+        5.0,
+        7.0
+      ],
+      "search_epochs": 10,
+      "search_img_size": 128,
+      "total_combinations": 18,
+      "seed": 42
+    }
+  }
+}

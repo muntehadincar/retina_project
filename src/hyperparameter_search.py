@@ -34,7 +34,7 @@ ALL_MODELS = {
     "attention_unet": {"class": AttentionUNet,   "img_size": SEARCH_IMGSIZE},
     "resunet":        {"class": ResUNet,         "img_size": SEARCH_IMGSIZE},
     "segformer":      {"class": SegFormerLite,   "img_size": SEARCH_IMGSIZE},
-    "swinunet":       {"class": SwinUNet,        "img_size": 128},
+    "swinunet":       {"class": SwinUNet,        "img_size": 224},  # Swin-Tiny 224 zorunlu
 }
 
 METRIC_KEYS = ["dice", "iou", "accuracy", "sensitivity", "specificity"]

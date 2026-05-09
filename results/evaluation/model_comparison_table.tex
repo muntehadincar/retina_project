@@ -1,0 +1,19 @@
+
+\begin{table}[h]
+\centering
+\caption{Model Karsilastirmasi -- Ortalama Test Metrikleri (n=119)}
+\label{tab:model_comparison}
+\begin{tabular}{lcccccc}
+\toprule
+\textbf{Model} & \textbf{Dice} & \textbf{IoU} & \textbf{Accuracy} & \textbf{Sensitivity} & \textbf{Specificity} & \textbf{Precision} \\
+\midrule
+U-Net & 0.7176 & 0.5704 & 0.9506 & 0.8378 & 0.9588 & 0.6440 \\
+Attention U-Net & 0.7329 & 0.5882 & 0.9495 & \textbf{0.9198} & 0.9505 & 0.6202 \\
+ResUNet & \textbf{0.7564} & \textbf{0.6243} & \textbf{0.9601} & 0.9133 & \textbf{0.9631} & \textbf{0.6631} \\
+SegFormer-Lite & 0.5259 & 0.3645 & 0.9040 & 0.7539 & 0.9146 & 0.4194 \\
+Swin-UNet & 0.6458 & 0.4842 & 0.9278 & 0.8605 & 0.9319 & 0.5266 \\
+\bottomrule
+\end{tabular}
+\vspace{2pt}
+\small\textit{Kalin degerler her sutundaki en yuksek performansi gostermektedir.}
+\end{table}

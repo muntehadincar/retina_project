@@ -1,0 +1,6 @@
+Model,Best LR,Best Batch,Best PosWeight,Best Dice,Best IoU,Combinations
+U-Net,0.001,4,3.0,0.6148,0.4493,18
+Attention U-Net,0.001,2,3.0,0.6137,0.448,18
+ResUNet,0.0005,4,3.0,0.6039,0.4379,18
+SegFormer-Lite,0.001,2,3.0,0.3684,0.2281,18
+Swin-UNet,0.001,2,3.0,0.6426,0.4787,18

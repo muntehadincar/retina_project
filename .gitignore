@@ -46,3 +46,8 @@ results/*.gif
 !assets/**
 !retina_system/frontend/**/*.png
 !retina_system/frontend/**/*.jpg
+!results/plots/white/*.png
+!results/evaluation/evaluation_comparison_white.png
+!results/evaluation/evaluation_comparison.png
+!results/evaluation/model_comparison_bar.png
+!results/evaluation/model_comparison_radar.png
